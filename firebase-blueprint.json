@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "Appointment": {
+      "title": "Appointment",
+      "description": "A booking request for a beauty service.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Customer name" },
+        "phone": { "type": "string", "description": "Customer phone number" },
+        "service": { "type": "string", "description": "Requested service" },
+        "date": { "type": "string", "description": "Appointment date (YYYY-MM-DD)" },
+        "time": { "type": "string", "description": "Appointment time (HH:mm)" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "rejected", "completed"], "description": "Current status of the appointment" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when the appointment was created" }
+      },
+      "required": ["name", "phone", "service", "date", "time", "status", "createdAt"]
+    },
+    "Service": {
+      "title": "Service",
+      "description": "A beauty service offered by the parlour.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Service name" },
+        "description": { "type": "string", "description": "Service description" },
+        "price": { "type": "string", "description": "Service price" },
+        "category": { "type": "string", "description": "Service category (e.g., Bridal, Makeup, Hair)" }
+      },
+      "required": ["name", "description", "price", "category"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Customer feedback and rating.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Customer name" },
+        "rating": { "type": "number", "description": "Rating from 1 to 5" },
+        "comment": { "type": "string", "description": "Review text" },
+        "approved": { "type": "boolean", "description": "Whether the review is approved for display" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when the review was created" }
+      },
+      "required": ["name", "rating", "comment", "approved", "createdAt"]
+    },
+    "GalleryItem": {
+      "title": "Gallery Item",
+      "description": "An image in the bridal gallery.",
+      "type": "object",
+      "properties": {
+        "url": { "type": "string", "description": "Firebase Storage URL of the image" },
+        "title": { "type": "string", "description": "Image title or description" },
+        "category": { "type": "string", "description": "Image category (e.g., Bridal, Party Makeup)" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when the image was added" }
+      },
+      "required": ["url", "title", "category", "createdAt"]
+    },
+    "Offer": {
+      "title": "Offer",
+      "description": "A special discount or promotional offer.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Offer title" },
+        "description": { "type": "string", "description": "Offer details" },
+        "code": { "type": "string", "description": "Promo code (optional)" },
+        "expiryDate": { "type": "string", "description": "Expiry date" },
+        "active": { "type": "boolean", "description": "Whether the offer is currently active" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when the offer was created" }
+      },
+      "required": ["title", "description", "active", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/appointments/{appointmentId}": { "schema": "Appointment", "description": "Customer appointment bookings" },
+    "/services/{serviceId}": { "schema": "Service", "description": "Parlour services" },
+    "/reviews/{reviewId}": { "schema": "Review", "description": "Customer reviews" },
+    "/gallery/{itemId}": { "schema": "GalleryItem", "description": "Bridal gallery images" },
+    "/offers/{offerId}": { "schema": "Offer", "description": "Promotional offers" }
+  }
+}
