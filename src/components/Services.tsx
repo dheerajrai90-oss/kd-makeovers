@@ -11,13 +11,13 @@ const DEFAULT_SERVICES: Service[] = [
   {
     name: 'Bridal Makeup',
     description: 'Complete bridal transformation including hair styling, draping, and premium HD makeup.',
-    price: '₹15,000 onwards',
+    price: '₹10,000 onwards',
     category: 'Bridal'
   },
   {
     name: 'Party Makeup',
     description: 'Elegant and sophisticated look for parties, weddings, and special events.',
-    price: '₹3,500 onwards',
+    price: '₹1,200 onwards',
     category: 'Makeup'
   },
   {
@@ -29,7 +29,7 @@ const DEFAULT_SERVICES: Service[] = [
   {
     name: 'Hair Styling',
     description: 'Professional hair styling from traditional buns to modern waves.',
-    price: '₹1,500 onwards',
+    price: '₹500 onwards',
     category: 'Hair'
   }
 ];

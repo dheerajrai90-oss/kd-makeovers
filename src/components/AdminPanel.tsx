@@ -45,7 +45,7 @@ export default function AdminPanel() {
   }, [newGalleryItem.file]);
 
   useEffect(() => {
-    if (!auth.currentUser || auth.currentUser.email !== 'dheeraj.rai90@gmail.com') return;
+    if (!auth.currentUser || (auth.currentUser.email !== 'komalbsc@gmail.com' && auth.currentUser.email !== 'dheeraj.rai90@gmail.com')) return;
 
     const unsubAppointments = onSnapshot(query(collection(db, 'appointments'), orderBy('createdAt', 'desc')), (snap) => {
       setAppointments(snap.docs.map(d => ({ id: d.id, ...d.data() } as Appointment)));
@@ -168,7 +168,7 @@ export default function AdminPanel() {
     toast.success('Offer deleted');
   };
 
-  if (!auth.currentUser || auth.currentUser.email !== 'dheeraj.rai90@gmail.com') {
+  if (!auth.currentUser || (auth.currentUser.email !== 'komalbsc@gmail.com' && auth.currentUser.email !== 'dheeraj.rai90@gmail.com')) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-soft-pink">
         <Card className="p-8 text-center max-w-md">

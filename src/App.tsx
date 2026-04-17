@@ -24,7 +24,7 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  const isAdmin = user?.email === 'dheeraj.rai90@gmail.com';
+  const isAdmin = user?.email === 'komalbsc@gmail.com' || user?.email === 'dheeraj.rai90@gmail.com';
 
   if (!isAuthReady) {
     return (

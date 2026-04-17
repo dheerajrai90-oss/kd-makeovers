@@ -4,6 +4,7 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
 import { Menu, X, LogIn, LogOut, User as UserIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { toast } from 'sonner';
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
@@ -14,7 +15,20 @@ export default function Navbar() {
     return () => unsubscribe();
   }, []);
 
-  const isAdmin = user?.email === 'dheeraj.rai90@gmail.com';
+  const handleLogin = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error: any) {
+      if (error.code === 'auth/popup-closed-by-user') {
+        toast.info('Login window was closed. Please try again.');
+        return;
+      }
+      toast.error('Failed to login. Please check your connection.');
+      console.error('Login error:', error);
+    }
+  };
+
+  const isAdmin = user?.email === 'komalbsc@gmail.com' || user?.email === 'dheeraj.rai90@gmail.com';
 
   const navLinks = [
     { name: 'Home', href: '#' },
@@ -58,7 +72,7 @@ export default function Navbar() {
                 </Button>
               </div>
             ) : (
-              <Button variant="outline" size="sm" onClick={signInWithGoogle} className="border-maroon text-maroon hover:bg-maroon hover:text-white">
+              <Button variant="outline" size="sm" onClick={handleLogin} className="border-maroon text-maroon hover:bg-maroon hover:text-white">
                 <LogIn className="w-4 h-4 mr-2" />
                 Admin Login
               </Button>
@@ -110,7 +124,7 @@ export default function Navbar() {
                     </Button>
                   </div>
                 ) : (
-                  <Button variant="outline" className="w-full border-maroon text-maroon" onClick={signInWithGoogle}>
+                  <Button variant="outline" className="w-full border-maroon text-maroon" onClick={handleLogin}>
                     <LogIn className="w-4 h-4 mr-2" />
                     Admin Login
                   </Button>

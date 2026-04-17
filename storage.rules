@@ -8,7 +8,7 @@ service firebase.storage {
       // Only allow the admin to upload/delete files
       // Note: Replace with your admin email check if needed, 
       // but usually we check request.auth != null for basic security
-      allow write: if request.auth != null && request.auth.token.email == "dheeraj.rai90@gmail.com";
+      allow write: if request.auth != null && (request.auth.token.email == "dheeraj.rai90@gmail.com" || request.auth.token.email == "komalbsc@gmail.com");
     }
   }
 }

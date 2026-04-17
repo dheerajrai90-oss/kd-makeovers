@@ -1,4 +1,5 @@
 import { Instagram, Facebook, MessageCircle, MapPin, Phone, Mail } from 'lucide-react';
+import { motion } from 'motion/react';
 
 export default function Footer() {
   return (
@@ -19,7 +20,12 @@ export default function Footer() {
               <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-gold hover:text-maroon transition-all">
                 <Facebook className="w-5 h-5" />
               </a>
-              <a href="https://wa.me/919650349357" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-gold hover:text-maroon transition-all">
+              <a 
+                href="https://api.whatsapp.com/send?phone=919650349357&text=Hello%20Komal!" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-gold hover:text-maroon transition-all"
+              >
                 <MessageCircle className="w-5 h-5" />
               </a>
             </div>
@@ -69,14 +75,35 @@ export default function Footer() {
       </div>
 
       {/* WhatsApp Floating Button */}
-      <a
-        href="https://wa.me/919650349357"
+      <motion.a
+        href="https://api.whatsapp.com/send?phone=919650349357&text=Hi%20Komal,%20I'd%20like%20to%20book%20a%20makeup%20session."
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 bg-green-500 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform flex items-center justify-center"
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="fixed bottom-6 right-6 z-[9999] flex items-center group cursor-pointer"
       >
-        <MessageCircle className="w-6 h-6" />
-      </a>
+        <motion.div
+          animate={{ 
+            scale: [1, 1.4, 1],
+            opacity: [0.6, 0, 0.6]
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute inset-0 bg-green-500 rounded-full pointer-events-none"
+        />
+        <div className="relative bg-green-500 text-white p-4 rounded-full shadow-2xl flex items-center gap-2 overflow-hidden ring-4 ring-white/20">
+          <MessageCircle className="w-6 h-6 fill-current" />
+          <span className="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-500 font-bold group-hover:ml-1">
+            Chat with us
+          </span>
+        </div>
+      </motion.a>
     </footer>
   );
 }

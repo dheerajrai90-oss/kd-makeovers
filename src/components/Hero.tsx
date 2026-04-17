@@ -1,12 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { motion } from 'motion/react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, MessageCircle } from 'lucide-react';
 
 export default function Hero() {
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
       {/* Background Image with Overlay */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 pointer-events-none">
         <img
           src="https://images.unsplash.com/photo-1595152248441-c3a8d4469040?q=80&w=2000&auto=format&fit=crop"
           alt="Indian Bridal Makeup"
@@ -16,7 +16,7 @@ export default function Hero() {
         <div className="absolute inset-0 bg-gradient-to-r from-maroon/80 to-maroon/40 mix-blend-multiply" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left">
+      <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -38,6 +38,17 @@ export default function Hero() {
             <Button size="lg" className="bg-gold hover:bg-gold/90 text-maroon font-bold text-lg h-14 px-8" asChild>
               <a href="#appointment">Book Appointment</a>
             </Button>
+            <Button size="lg" className="bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-lg h-14 px-8" asChild>
+              <a 
+                href="https://api.whatsapp.com/send?phone=919650349357&text=Hi%20Komal,%20I'm%20interested%20in%20your%20makeup%20services!" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2"
+              >
+                <MessageCircle className="w-5 h-5 fill-current" />
+                Chat on WhatsApp
+              </a>
+            </Button>
             <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 font-bold text-lg h-14 px-8" asChild>
               <a href="#gallery">View Gallery</a>
             </Button>
@@ -46,7 +57,7 @@ export default function Hero() {
       </div>
 
       {/* Decorative Elements */}
-      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-soft-pink to-transparent z-10" />
+      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-soft-pink to-transparent z-10 pointer-events-none" />
     </section>
   );
 }

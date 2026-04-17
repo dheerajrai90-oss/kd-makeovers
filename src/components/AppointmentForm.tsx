@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Calendar as CalendarIcon, Clock, User, Phone, Sparkles } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, User, Phone, Sparkles, MessageCircle } from 'lucide-react';
 import { motion } from 'motion/react';
 
 const appointmentSchema = z.object({
@@ -143,9 +143,32 @@ export default function AppointmentForm() {
                     <Textarea id="notes" {...register('notes')} className="border-maroon/20 focus:border-maroon" placeholder="Tell us more about your requirements..." />
                   </div>
 
-                  <Button type="submit" disabled={isSubmitting} className="w-full bg-maroon hover:bg-maroon/90 text-white font-bold h-12">
-                    {isSubmitting ? 'Booking...' : 'Confirm Appointment'}
-                  </Button>
+                  <div className="flex flex-col gap-3">
+                    <Button type="submit" disabled={isSubmitting} className="w-full bg-maroon hover:bg-maroon/90 text-white font-bold h-12">
+                      {isSubmitting ? 'Booking...' : 'Confirm Appointment'}
+                    </Button>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-px bg-gray-200" />
+                      <span className="text-xs text-gray-400 font-medium">OR</span>
+                      <div className="flex-1 h-px bg-gray-200" />
+                    </div>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      className="w-full border-[#25D366] text-[#25D366] hover:bg-[#25D366]/5 font-bold h-12"
+                      asChild
+                    >
+                      <a 
+                        href="https://api.whatsapp.com/send?phone=919650349357&text=Hi%20Komal,%20I'd%20like%20to%20know%20more%20about%20your%20bridal/party%20makeup%20packages." 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2"
+                      >
+                        <MessageCircle className="w-4 h-4 fill-current" />
+                        Quick Chat on WhatsApp
+                      </a>
+                    </Button>
+                  </div>
                 </form>
               </div>
             </div>

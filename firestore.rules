@@ -6,7 +6,7 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return isAuthenticated() && request.auth.token.email == "dheeraj.rai90@gmail.com";
+      return isAuthenticated() && (request.auth.token.email == "dheeraj.rai90@gmail.com" || request.auth.token.email == "komalbsc@gmail.com");
     }
 
     match /appointments/{appointmentId} {
