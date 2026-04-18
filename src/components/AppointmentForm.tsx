@@ -1,23 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { db } from '@/src/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db, auth, signInWithGoogle } from '@/src/firebase';
+import { collection, addDoc, serverTimestamp, onSnapshot, query, doc, updateDoc, increment } from 'firebase/firestore';
+import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Calendar as CalendarIcon, Clock, User, Phone, Sparkles, MessageCircle } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, User, Phone, Sparkles, MessageCircle, Coins, LogIn } from 'lucide-react';
 import { motion } from 'motion/react';
+import { Service, UserProfile } from '@/src/types';
 
 const appointmentSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   phone: z.string().min(10, 'Phone number must be at least 10 digits').max(15),
-  service: z.string().min(1, 'Please select a service'),
+  serviceId: z.string().min(1, 'Please select a service'),
+  serviceName: z.string(),
   date: z.string().min(1, 'Please select a date'),
   time: z.string().min(1, 'Please select a time'),
   notes: z.string().optional(),
@@ -27,29 +31,123 @@ type AppointmentFormValues = z.infer<typeof appointmentSchema>;
 
 export default function AppointmentForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [services, setServices] = useState<Service[]>([]);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [redeemPoints, setRedeemPoints] = useState(false);
+  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
 
-  const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm<AppointmentFormValues>({
+  useEffect(() => {
+    const unsubAuth = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+
+    const unsubServices = onSnapshot(query(collection(db, 'services')), (snap) => {
+      setServices(snap.docs.map(d => ({ id: d.id, ...d.data() } as Service)));
+    });
+    
+    let unsubProfile = () => {};
+    const setupProfileListener = (uid: string) => {
+      unsubProfile = onSnapshot(doc(db, 'userProfiles', uid), (snap) => {
+        if (snap.exists()) setUserProfile(snap.data() as UserProfile);
+      });
+    };
+
+    if (auth.currentUser) {
+      setupProfileListener(auth.currentUser.uid);
+    }
+
+    return () => {
+      unsubAuth();
+      unsubServices();
+      unsubProfile();
+    };
+  }, []);
+
+  const { register, handleSubmit, setValue, reset, watch, formState: { errors } } = useForm<AppointmentFormValues>({
     resolver: zodResolver(appointmentSchema),
     defaultValues: {
-      status: 'pending'
-    } as any
+      serviceName: '',
+      date: '',
+      time: '',
+      notes: ''
+    }
   });
+
+  const watchServiceId = watch('serviceId');
+
+  useEffect(() => {
+    if (watchServiceId) {
+      const s = services.find(srv => srv.id === watchServiceId);
+      if (s) {
+        setSelectedService(s);
+        setValue('serviceName', s.name);
+        
+        // Reset redemption if price is below threshold
+        const price = parseInt(s.price.replace(/[^0-9]/g, '')) || 0;
+        if (price < 500) {
+          setRedeemPoints(false);
+        }
+      }
+    }
+  }, [watchServiceId, services, setValue]);
 
   const onSubmit = async (data: AppointmentFormValues) => {
     setIsSubmitting(true);
     try {
+      const userId = auth.currentUser?.uid;
+      
+      // Parse numeric price from service price string
+      const numericPrice = selectedService 
+        ? parseInt(selectedService.price.replace(/[^0-9]/g, '')) || 0 
+        : 0;
+
+      const pointsToUse = redeemPoints && userProfile ? userProfile.loyaltyPoints : 0;
+
       await addDoc(collection(db, 'appointments'), {
-        ...data,
+        name: data.name,
+        phone: data.phone,
+        service: data.serviceName,
+        serviceId: data.serviceId,
+        date: data.date,
+        time: data.time,
+        notes: data.notes || '',
+        price: numericPrice,
+        pointsUsed: pointsToUse,
+        userId: userId || null,
         status: 'pending',
         createdAt: serverTimestamp(),
       });
-      toast.success('Appointment booked successfully! We will contact you soon.');
+
+      if (pointsToUse > 0 && userId) {
+        // Mark points as "reserved" or just deduct now for simplicity
+        const userRef = doc(db, 'userProfiles', userId);
+        await updateDoc(userRef, {
+          loyaltyPoints: increment(-pointsToUse),
+          updatedAt: serverTimestamp()
+        });
+      }
+
+      toast.success('Appointment booked successfully! Your points have been applied as a discount.');
       reset();
+      setSelectedService(null);
     } catch (error) {
       console.error('Error booking appointment:', error);
       toast.error('Failed to book appointment. Please try again.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleLogin = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error: any) {
+      if (error.code === 'auth/popup-closed-by-user') {
+        toast.info('Login window was closed. Please try again.');
+        return;
+      }
+      toast.error('Failed to login. Please try again.');
     }
   };
 
@@ -81,8 +179,32 @@ export default function AppointmentForm() {
                 </div>
               </div>
               
-              <div className="md:col-span-3 p-8 bg-white">
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div className="md:col-span-3 p-8 bg-white relative">
+                {!currentUser ? (
+                  <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-[2px] flex items-center justify-center p-8 text-center">
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-white p-8 rounded-2xl shadow-xl border border-maroon/10 max-w-sm"
+                    >
+                      <div className="w-16 h-16 bg-soft-pink rounded-full flex items-center justify-center mx-auto mb-6">
+                        <LogIn className="w-8 h-8 text-maroon" />
+                      </div>
+                      <h4 className="text-xl font-serif font-bold text-maroon mb-2">Login Required</h4>
+                      <p className="text-gray-500 text-sm mb-8">
+                        To provide you with a personalized experience and loyalty points, please sign in before booking your appointment.
+                      </p>
+                      <Button 
+                        onClick={handleLogin} 
+                        className="w-full bg-maroon hover:bg-maroon/90 text-white font-bold h-12 shadow-lg"
+                      >
+                        Sign in with Google
+                      </Button>
+                    </motion.div>
+                  </div>
+                ) : null}
+
+                <form onSubmit={handleSubmit(onSubmit)} className={`space-y-6 ${!currentUser ? 'opacity-20 pointer-events-none' : ''}`}>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name" className="text-maroon font-medium">Full Name</Label>
@@ -103,21 +225,66 @@ export default function AppointmentForm() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="service" className="text-maroon font-medium">Service</Label>
-                    <Select onValueChange={(value: string) => setValue('service', value)}>
+                    <div className="flex justify-between items-center">
+                      <Label htmlFor="service" className="text-maroon font-medium">Service</Label>
+                      {selectedService && (
+                        <div className="flex items-center text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full ring-1 ring-green-100">
+                          <Coins className="w-3 h-3 mr-1 fill-current" />
+                          +{Math.floor((parseInt(selectedService.price.replace(/[^0-9]/g, '')) || 0) * 0.1)} Points
+                        </div>
+                      )}
+                    </div>
+                    <Select onValueChange={(value: string) => setValue('serviceId', value)}>
                       <SelectTrigger className="border-maroon/20 focus:border-maroon">
                         <SelectValue placeholder="Select a service" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Bridal Makeup">Bridal Makeup</SelectItem>
-                        <SelectItem value="Party Makeup">Party Makeup</SelectItem>
-                        <SelectItem value="Engagement Makeup">Engagement Makeup</SelectItem>
-                        <SelectItem value="Hair Styling">Hair Styling</SelectItem>
-                        <SelectItem value="Other">Other Services</SelectItem>
+                        {services.map(s => (
+                          <SelectItem key={s.id} value={s.id!}>{s.name} ({s.price})</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
-                    {errors.service && <p className="text-red-500 text-xs">{errors.service.message}</p>}
+                    {errors.serviceId && <p className="text-red-500 text-xs">{errors.serviceId.message}</p>}
                   </div>
+
+                  {userProfile && userProfile.loyaltyPoints > 0 && (
+                    <motion.div 
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      className="bg-gold/5 border border-gold/20 rounded-lg p-4"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center text-sm font-bold text-maroon">
+                          <Coins className="w-4 h-4 mr-2 text-gold fill-current" />
+                          Rewards Balance: {userProfile.loyaltyPoints} Points
+                        </div>
+                        {selectedService && (parseInt(selectedService.price.replace(/[^0-9]/g, '')) || 0) >= 500 ? (
+                          <button
+                            type="button"
+                            onClick={() => setRedeemPoints(!redeemPoints)}
+                            className={`text-xs font-bold px-3 py-1 rounded-full transition-all ${
+                              redeemPoints 
+                                ? 'bg-maroon text-white shadow-md' 
+                                : 'bg-gold/20 text-maroon border border-maroon/20 hover:bg-gold/30'
+                            }`}
+                          >
+                            {redeemPoints ? '✓ Redeeming' : 'Redeem for ₹' + userProfile.loyaltyPoints + ' off'}
+                          </button>
+                        ) : (
+                          <Badge variant="outline" className="text-[10px] border-maroon/20 text-maroon/50 bg-white">
+                            Min. ₹500 needed
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-gray-500 italic">
+                        {selectedService && (parseInt(selectedService.price.replace(/[^0-9]/g, '')) || 0) < 500
+                          ? "Note: Points can only be redeemed on services worth ₹500 or more."
+                          : redeemPoints 
+                            ? "Great choice! These points will be applied as a discount on your final bill." 
+                            : "You have points available! Use them to get a direct discount on this booking."}
+                      </p>
+                    </motion.div>
+                  )}
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">

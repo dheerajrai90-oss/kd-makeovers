@@ -35,7 +35,7 @@ export default function Navbar() {
     { name: 'Services', href: '#services' },
     { name: 'Offers', href: '#offers' },
     { name: 'Gallery', href: '#gallery' },
-    { name: 'Reviews', href: '#reviews' },
+    ...(user && !isAdmin ? [{ name: 'My Bookings', href: '#my-bookings' }] : []),
     ...(isAdmin ? [{ name: 'Admin', href: '#admin' }] : []),
   ];
 
@@ -64,7 +64,7 @@ export default function Navbar() {
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2 text-sm text-gray-600">
                   <UserIcon className="w-4 h-4" />
-                  <span className="max-w-[100px] truncate">{user.displayName}</span>
+                  <span className="max-w-[100px] truncate">{user.displayName || 'Customer'}</span>
                 </div>
                 <Button variant="ghost" size="sm" onClick={logout} className="text-maroon">
                   <LogOut className="w-4 h-4 mr-2" />
@@ -72,9 +72,9 @@ export default function Navbar() {
                 </Button>
               </div>
             ) : (
-              <Button variant="outline" size="sm" onClick={handleLogin} className="border-maroon text-maroon hover:bg-maroon hover:text-white">
+              <Button size="sm" onClick={handleLogin} className="bg-maroon text-white hover:bg-maroon/90 font-bold">
                 <LogIn className="w-4 h-4 mr-2" />
-                Admin Login
+                Customer Login
               </Button>
             )}
           </div>
@@ -116,7 +116,7 @@ export default function Navbar() {
                   <div className="space-y-2">
                     <div className="px-3 py-2 text-sm text-gray-600 flex items-center">
                       <UserIcon className="w-4 h-4 mr-2" />
-                      {user.displayName}
+                      {user.displayName || 'Customer'}
                     </div>
                     <Button variant="ghost" className="w-full justify-start text-maroon" onClick={logout}>
                       <LogOut className="w-4 h-4 mr-2" />
@@ -124,9 +124,9 @@ export default function Navbar() {
                     </Button>
                   </div>
                 ) : (
-                  <Button variant="outline" className="w-full border-maroon text-maroon" onClick={handleLogin}>
+                  <Button className="w-full bg-maroon text-white font-bold" onClick={handleLogin}>
                     <LogIn className="w-4 h-4 mr-2" />
-                    Admin Login
+                    Customer Login
                   </Button>
                 )}
               </div>

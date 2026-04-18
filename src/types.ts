@@ -1,12 +1,25 @@
 export interface Appointment {
   id?: string;
+  userId?: string;
   name: string;
   phone: string;
   service: string;
   date: string;
   time: string;
   status: 'pending' | 'confirmed' | 'rejected' | 'completed';
+  price?: number;
+  pointsUsed?: number;
+  pointsEarned?: number;
   createdAt: any;
+}
+
+export interface UserProfile {
+  uid: string;
+  email: string;
+  displayName: string;
+  loyaltyPoints: number;
+  totalSpent: number;
+  updatedAt: any;
 }
 
 export interface Service {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db, storage, auth } from '@/src/firebase';
 import { 
-  collection, onSnapshot, query, orderBy, updateDoc, doc, deleteDoc, addDoc, serverTimestamp 
+  collection, onSnapshot, query, orderBy, updateDoc, doc, deleteDoc, addDoc, serverTimestamp, getDoc, increment 
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Appointment, Service, Review, GalleryItem, Offer } from '@/src/types';
@@ -16,7 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { 
-  Calendar, Users, Star, Image as ImageIcon, Check, X, Trash2, Plus, Upload, Loader2, Tag 
+  Calendar, Users, Star, Image as ImageIcon, Check, X, Trash2, Plus, Upload, Loader2, Tag, TrendingUp 
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -79,10 +79,37 @@ export default function AdminPanel() {
   // Appointment Actions
   const updateAppointmentStatus = async (id: string, status: string) => {
     try {
-      await updateDoc(doc(db, 'appointments', id), { status });
+      const appRef = doc(db, 'appointments', id);
+      const appSnap = await getDoc(appRef);
+      const appData = appSnap.data() as Appointment;
+
+      await updateDoc(appRef, { status });
+
+      // Loyalty Point Logic
+      if (status === 'completed' && appData.userId) {
+        // Try to estimate points if price is available
+        // Usually, the price would be entered by admin or derived from service
+        // For now, let's assume a default logic or check for price field
+        const priceValue = appData.price || 0;
+        const pointsEarned = Math.floor(priceValue * 0.1); // 10% back in points
+
+        if (pointsEarned > 0) {
+          const userRef = doc(db, 'userProfiles', appData.userId);
+          await updateDoc(userRef, {
+            loyaltyPoints: increment(pointsEarned),
+            totalSpent: increment(priceValue),
+            updatedAt: serverTimestamp()
+          });
+          
+          await updateDoc(appRef, { pointsEarned });
+          toast.success(`Awarded ${pointsEarned} loyalty points!`);
+        }
+      }
+
       toast.success(`Appointment ${status}`);
-    } catch (e) {
-      toast.error('Failed to update status');
+    } catch (e: any) {
+      console.error('Update status error:', e);
+      toast.error(`Error: ${e.message}`);
     }
   };
 
@@ -131,8 +158,9 @@ export default function AdminPanel() {
       });
       toast.success('Image uploaded to gallery');
       setNewGalleryItem({ title: '', category: 'Bridal', file: null });
-    } catch (e) {
-      toast.error('Upload failed');
+    } catch (e: any) {
+      console.error('Upload error details:', e);
+      toast.error(`Upload failed: ${e.message || 'Unknown error'}`);
     } finally {
       setIsUploading(false);
     }
@@ -235,6 +263,7 @@ export default function AdminPanel() {
                       <TableRow>
                         <TableHead>Customer</TableHead>
                         <TableHead>Service</TableHead>
+                        <TableHead>Value/Points</TableHead>
                         <TableHead>Date & Time</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
@@ -248,6 +277,19 @@ export default function AdminPanel() {
                             <div className="text-xs text-gray-500">{app.phone}</div>
                           </TableCell>
                           <TableCell>{app.service}</TableCell>
+                          <TableCell>
+                            <div className="text-sm font-bold text-maroon">₹{app.price?.toLocaleString()}</div>
+                            {app.pointsUsed ? (
+                              <div className="text-[10px] text-red-500 flex items-center">
+                                <TrendingUp className="w-3 h-3 mr-1 rotate-180" /> -{app.pointsUsed} Points (Redeemed)
+                              </div>
+                            ) : null}
+                            {app.pointsEarned ? (
+                              <div className="text-[10px] text-green-600 flex items-center">
+                                <TrendingUp className="w-3 h-3 mr-1" /> +{app.pointsEarned} Points (Awarded)
+                              </div>
+                            ) : null}
+                          </TableCell>
                           <TableCell>
                             <div>{app.date}</div>
                             <div className="text-xs text-gray-500">{app.time}</div>

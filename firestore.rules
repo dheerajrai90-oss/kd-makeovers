@@ -11,7 +11,14 @@ service cloud.firestore {
 
     match /appointments/{appointmentId} {
       allow create: if true;
-      allow read, update, delete: if isAdmin();
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+
+    match /userProfiles/{uid} {
+      allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == uid);
+      allow create: if isAuthenticated() && request.auth.uid == uid && request.resource.data.loyaltyPoints == 0;
+      allow update: if isAdmin();
     }
 
     match /services/{serviceId} {
