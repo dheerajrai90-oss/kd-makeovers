@@ -29,9 +29,54 @@ const appointmentSchema = z.object({
 
 type AppointmentFormValues = z.infer<typeof appointmentSchema>;
 
+const DEFAULT_SERVICES: Service[] = [
+  {
+    id: 'bridal-makeup',
+    name: 'Bridal Makeup',
+    description: 'Complete bridal transformation including hair styling, draping, and premium HD makeup.',
+    price: '₹10,000 onwards',
+    category: 'Bridal'
+  },
+  {
+    id: 'party-makeup',
+    name: 'Party Makeup',
+    description: 'Elegant and sophisticated look for parties, weddings, and special events.',
+    price: '₹1,200 onwards',
+    category: 'Makeup'
+  },
+  {
+    id: 'engagement-makeup',
+    name: 'Engagement Makeup',
+    description: 'Soft and glowing look tailored for your engagement ceremony.',
+    price: '₹7,000 onwards',
+    category: 'Bridal'
+  },
+  {
+    id: 'hair-styling',
+    name: 'Hair Styling',
+    description: 'Professional hair styling from traditional buns to modern waves.',
+    price: '₹500 onwards',
+    category: 'Hair'
+  },
+  {
+    id: 'beauty-service',
+    name: 'Beauty Service',
+    description: 'General beauty treatments including cleanup, threading, and waxing.',
+    price: '',
+    category: 'Beauty'
+  },
+  {
+    id: 'other-service',
+    name: 'Custom Service',
+    description: 'Any other beauty requirement not listed above.',
+    price: 'Flexible',
+    category: 'Other'
+  }
+];
+
 export default function AppointmentForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [services, setServices] = useState<Service[]>([]);
+  const [services, setServices] = useState<Service[]>(DEFAULT_SERVICES);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [redeemPoints, setRedeemPoints] = useState(false);
@@ -43,7 +88,10 @@ export default function AppointmentForm() {
     });
 
     const unsubServices = onSnapshot(query(collection(db, 'services')), (snap) => {
-      setServices(snap.docs.map(d => ({ id: d.id, ...d.data() } as Service)));
+      const servicesData = snap.docs.map(d => ({ id: d.id, ...d.data() } as Service));
+      if (servicesData.length > 0) {
+        setServices(servicesData);
+      }
     });
     
     let unsubProfile = () => {};
@@ -67,6 +115,7 @@ export default function AppointmentForm() {
   const { register, handleSubmit, setValue, reset, watch, formState: { errors } } = useForm<AppointmentFormValues>({
     resolver: zodResolver(appointmentSchema),
     defaultValues: {
+      serviceId: '',
       serviceName: '',
       date: '',
       time: '',
@@ -234,17 +283,33 @@ export default function AppointmentForm() {
                         </div>
                       )}
                     </div>
-                    <Select onValueChange={(value: string) => setValue('serviceId', value)}>
-                      <SelectTrigger className="border-maroon/20 focus:border-maroon">
+                    
+                    <Select 
+                      value={watchServiceId || ""} 
+                      onValueChange={(val) => setValue('serviceId', val, { shouldValidate: true })}
+                    >
+                      <SelectTrigger className="w-full border-maroon/20 focus:border-maroon h-12 bg-white text-maroon">
                         <SelectValue placeholder="Select a service" />
                       </SelectTrigger>
-                      <SelectContent>
-                        {services.map(s => (
-                          <SelectItem key={s.id} value={s.id!}>{s.name} ({s.price})</SelectItem>
-                        ))}
+                      <SelectContent className="bg-white border border-maroon/10 shadow-xl z-50">
+                        {services.length > 0 ? (
+                          services.map((s) => (
+                            <SelectItem 
+                              key={s.id || s.name} 
+                              value={s.id || s.name}
+                              className="focus:bg-soft-pink focus:text-maroon"
+                            >
+                              {s.name}{s.price ? ` — ${s.price}` : ''}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <div className="p-3 text-sm text-gray-500 text-center italic">
+                            No services found.
+                          </div>
+                        )}
                       </SelectContent>
                     </Select>
-                    {errors.serviceId && <p className="text-red-500 text-xs">{errors.serviceId.message}</p>}
+                    {errors.serviceId && <p className="text-red-500 text-xs mt-1">{errors.serviceId.message}</p>}
                   </div>
 
                   {userProfile && userProfile.loyaltyPoints > 0 && (

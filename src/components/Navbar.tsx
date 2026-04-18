@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { auth, signInWithGoogle, logout } from '@/src/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
@@ -39,6 +39,34 @@ export default function Navbar() {
     ...(isAdmin ? [{ name: 'Admin', href: '#admin' }] : []),
   ];
 
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith('#') && href !== '#') {
+      e.preventDefault();
+      const element = document.getElementById(href.substring(1));
+      if (element) {
+        setIsMenuOpen(false);
+        // Small delay to allow menu animation to start closing
+        setTimeout(() => {
+          const navHeight = 64; // h-16 = 64px
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - navHeight;
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }, 100);
+      }
+    } else if (href === '#') {
+      e.preventDefault();
+      setIsMenuOpen(false);
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-maroon/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -55,6 +83,7 @@ export default function Navbar() {
               <a
                 key={link.name}
                 href={link.href}
+                onClick={(e) => handleNavClick(e, link.href)}
                 className="text-sm font-medium text-gray-700 hover:text-maroon transition-colors"
               >
                 {link.name}
@@ -105,7 +134,7 @@ export default function Navbar() {
                 <a
                   key={link.name}
                   href={link.href}
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={(e) => handleNavClick(e, link.href)}
                   className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-maroon hover:bg-maroon/5 rounded-md"
                 >
                   {link.name}

@@ -31,6 +31,18 @@ const DEFAULT_SERVICES: Service[] = [
     description: 'Professional hair styling from traditional buns to modern waves.',
     price: '₹500 onwards',
     category: 'Hair'
+  },
+  {
+    name: 'Beauty Service',
+    description: 'General beauty treatments including cleanup, threading, and waxing.',
+    price: '',
+    category: 'Beauty'
+  },
+  {
+    name: 'Others',
+    description: 'Have a specific request? We provide custom beauty services on demand.',
+    price: 'Flexible',
+    category: 'Other'
   }
 ];
 
@@ -51,6 +63,8 @@ export default function Services() {
       case 'bridal': return <Heart className="w-6 h-6 text-maroon" />;
       case 'makeup': return <Sparkles className="w-6 h-6 text-maroon" />;
       case 'hair': return <Scissors className="w-6 h-6 text-maroon" />;
+      case 'beauty': return <Sparkles className="w-6 h-6 text-maroon" />;
+      case 'other': return <Star className="w-6 h-6 text-maroon" />;
       default: return <Star className="w-6 h-6 text-maroon" />;
     }
   };
