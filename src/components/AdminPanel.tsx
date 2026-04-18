@@ -4,7 +4,7 @@ import {
   collection, onSnapshot, query, orderBy, updateDoc, doc, deleteDoc, addDoc, serverTimestamp, getDoc, increment 
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { Appointment, Service, Review, GalleryItem, Offer } from '@/src/types';
+import { Appointment, Service, Review, GalleryItem, Offer, UserProfile } from '@/src/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { 
-  Calendar, Users, Star, Image as ImageIcon, Check, X, Trash2, Plus, Upload, Loader2, Tag, TrendingUp 
+  Calendar, Users, Star, Image as ImageIcon, Check, X, Trash2, Plus, Upload, Loader2, Tag, TrendingUp, Coins 
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -26,11 +26,13 @@ export default function AdminPanel() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
   const [offers, setOffers] = useState<Offer[]>([]);
+  const [users, setUsers] = useState<UserProfile[]>([]);
   
   const [isUploading, setIsUploading] = useState(false);
   const [newService, setNewService] = useState({ name: '', description: '', price: '', category: 'Makeup' });
   const [newGalleryItem, setNewGalleryItem] = useState({ title: '', category: 'Bridal', file: null as File | null });
   const [newOffer, setNewOffer] = useState({ title: '', description: '', code: '', expiryDate: '', active: true });
+  const [editingPrice, setEditingPrice] = useState<{id: string, value: string} | null>(null);
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -67,12 +69,17 @@ export default function AdminPanel() {
       setOffers(snap.docs.map(d => ({ id: d.id, ...d.data() } as Offer)));
     });
 
+    const unsubUsers = onSnapshot(query(collection(db, 'userProfiles')), (snap) => {
+      setUsers(snap.docs.map(d => ({ uid: d.id, ...d.data() } as any as UserProfile)));
+    });
+
     return () => {
       unsubAppointments();
       unsubServices();
       unsubReviews();
       unsubGallery();
       unsubOffers();
+      unsubUsers();
     };
   }, []);
 
@@ -86,10 +93,7 @@ export default function AdminPanel() {
       await updateDoc(appRef, { status });
 
       // Loyalty Point Logic
-      if (status === 'completed' && appData.userId) {
-        // Try to estimate points if price is available
-        // Usually, the price would be entered by admin or derived from service
-        // For now, let's assume a default logic or check for price field
+      if (status === 'completed' && appData.userId && !appData.pointsEarned) {
         const priceValue = appData.price || 0;
         const pointsEarned = Math.floor(priceValue * 0.1); // 10% back in points
 
@@ -109,6 +113,42 @@ export default function AdminPanel() {
       toast.success(`Appointment ${status}`);
     } catch (e: any) {
       console.error('Update status error:', e);
+      toast.error(`Error: ${e.message}`);
+    }
+  };
+
+  const updateAppointmentPrice = async (id: string, newPriceStr: string) => {
+    const newPrice = parseInt(newPriceStr);
+    if (isNaN(newPrice)) {
+      toast.error('Please enter a valid number for price');
+      return;
+    }
+
+    try {
+      const appRef = doc(db, 'appointments', id);
+      const appSnap = await getDoc(appRef);
+      const appData = appSnap.data() as Appointment;
+
+      const oldPrice = appData.price || 0;
+      const oldPoints = appData.pointsEarned || 0;
+      const newPoints = Math.floor(newPrice * 0.1);
+
+      await updateDoc(appRef, { price: newPrice });
+
+      if (appData.status === 'completed' && appData.userId) {
+        const userRef = doc(db, 'userProfiles', appData.userId);
+        await updateDoc(userRef, {
+          loyaltyPoints: increment(newPoints - oldPoints),
+          totalSpent: increment(newPrice - oldPrice),
+          updatedAt: serverTimestamp()
+        });
+        await updateDoc(appRef, { pointsEarned: newPoints });
+        toast.success(`Price updated and points adjusted to ${newPoints}`);
+      } else {
+        toast.success(`Price updated to ₹${newPrice}`);
+      }
+      setEditingPrice(null);
+    } catch (e: any) {
       toast.error(`Error: ${e.message}`);
     }
   };
@@ -196,6 +236,19 @@ export default function AdminPanel() {
     toast.success('Offer deleted');
   };
 
+  // User Actions
+  const adjustPoints = async (uid: string, amount: number) => {
+    try {
+      await updateDoc(doc(db, 'userProfiles', uid), {
+        loyaltyPoints: increment(amount),
+        updatedAt: serverTimestamp()
+      });
+      toast.success(`Points updated successfully`);
+    } catch (e: any) {
+      toast.error(`Error updating points: ${e.message}`);
+    }
+  };
+
   if (!auth.currentUser || (auth.currentUser.email !== 'komalbsc@gmail.com' && auth.currentUser.email !== 'dheeraj.rai90@gmail.com')) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-soft-pink">
@@ -245,6 +298,10 @@ export default function AdminPanel() {
               <Tag className="w-4 h-4 mr-2" />
               Offers
             </TabsTrigger>
+            <TabsTrigger value="users" className="data-[state=active]:bg-maroon data-[state=active]:text-white px-6 py-2">
+              <Users className="w-4 h-4 mr-2" />
+              Users
+            </TabsTrigger>
           </TabsList>
 
           {/* Appointments Tab */}
@@ -278,17 +335,46 @@ export default function AdminPanel() {
                           </TableCell>
                           <TableCell>{app.service}</TableCell>
                           <TableCell>
-                            <div className="text-sm font-bold text-maroon">₹{app.price?.toLocaleString()}</div>
-                            {app.pointsUsed ? (
-                              <div className="text-[10px] text-red-500 flex items-center">
-                                <TrendingUp className="w-3 h-3 mr-1 rotate-180" /> -{app.pointsUsed} Points (Redeemed)
+                            {editingPrice?.id === app.id ? (
+                              <div className="flex items-center gap-2">
+                                <Input 
+                                  className="w-20 h-8 text-xs" 
+                                  value={editingPrice.value} 
+                                  type="number"
+                                  onChange={(e) => setEditingPrice({ id: app.id!, value: e.target.value })}
+                                />
+                                <Button size="sm" className="h-8 px-2" onClick={() => updateAppointmentPrice(app.id!, editingPrice.value)}>
+                                  <Check className="w-3 h-3" />
+                                </Button>
+                                <Button size="sm" variant="ghost" className="h-8 px-2" onClick={() => setEditingPrice(null)}>
+                                  <X className="w-3 h-3" />
+                                </Button>
                               </div>
-                            ) : null}
-                            {app.pointsEarned ? (
-                              <div className="text-[10px] text-green-600 flex items-center">
-                                <TrendingUp className="w-3 h-3 mr-1" /> +{app.pointsEarned} Points (Awarded)
+                            ) : (
+                              <div className="flex flex-col group relative">
+                                <div className="text-sm font-bold text-maroon flex items-center gap-1">
+                                  ₹{app.price?.toLocaleString() || 0}
+                                  <Button 
+                                    size="sm" 
+                                    variant="ghost" 
+                                    className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    onClick={() => setEditingPrice({ id: app.id!, value: (app.price || 0).toString() })}
+                                  >
+                                    <Plus className="w-3 h-3" />
+                                  </Button>
+                                </div>
+                                {app.pointsUsed ? (
+                                  <div className="text-[10px] text-red-500 flex items-center">
+                                    <TrendingUp className="w-3 h-3 mr-1 rotate-180" /> -{app.pointsUsed} Points (Redeemed)
+                                  </div>
+                                ) : null}
+                                {app.pointsEarned ? (
+                                  <div className="text-[10px] text-green-600 flex items-center">
+                                    <TrendingUp className="w-3 h-3 mr-1" /> +{app.pointsEarned} Points (Awarded)
+                                  </div>
+                                ) : null}
                               </div>
-                            ) : null}
+                            )}
                           </TableCell>
                           <TableCell>
                             <div>{app.date}</div>
@@ -609,6 +695,84 @@ export default function AdminPanel() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Users Tab */}
+          <TabsContent value="users">
+            <Card className="border-none shadow-xl">
+              <CardHeader>
+                <CardTitle className="text-maroon flex items-center">
+                  <Users className="w-5 h-5 mr-2" />
+                  Manage Customer Loyalty
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Customer</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Total Spent</TableHead>
+                        <TableHead>Current Points</TableHead>
+                        <TableHead className="text-right">Adjust Points</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {users.map((u) => (
+                        <TableRow key={u.uid}>
+                          <TableCell className="font-medium">{u.displayName || 'Anonymous'}</TableCell>
+                          <TableCell className="text-gray-500">{u.email}</TableCell>
+                          <TableCell>₹{u.totalSpent?.toLocaleString() || 0}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Coins className="w-4 h-4 text-gold fill-current" />
+                              <span className="font-bold text-maroon text-lg">{u.loyaltyPoints || 0}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="text-red-600 border-red-200 hover:bg-red-50"
+                                onClick={() => adjustPoints(u.uid, -10)}
+                              >
+                                -10
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="text-red-600 border-red-200 hover:bg-red-50"
+                                onClick={() => adjustPoints(u.uid, -50)}
+                              >
+                                -50
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="text-green-600 border-green-200 hover:bg-green-50"
+                                onClick={() => adjustPoints(u.uid, 50)}
+                              >
+                                +50
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="text-green-600 border-green-200 hover:bg-green-50"
+                                onClick={() => adjustPoints(u.uid, 100)}
+                              >
+                                +100
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>

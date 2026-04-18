@@ -65,6 +65,20 @@
         "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when the offer was created" }
       },
       "required": ["title", "description", "active", "createdAt"]
+    },
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "User account information and loyalty points.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "loyaltyPoints": { "type": "number" },
+        "totalSpent": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "loyaltyPoints", "totalSpent"]
     }
   },
   "firestore": {
@@ -72,6 +86,7 @@
     "/services/{serviceId}": { "schema": "Service", "description": "Parlour services" },
     "/reviews/{reviewId}": { "schema": "Review", "description": "Customer reviews" },
     "/gallery/{itemId}": { "schema": "GalleryItem", "description": "Bridal gallery images" },
-    "/offers/{offerId}": { "schema": "Offer", "description": "Promotional offers" }
+    "/offers/{offerId}": { "schema": "Offer", "description": "Promotional offers" },
+    "/userProfiles/{uid}": { "schema": "UserProfile", "description": "User profile and loyalty data" }
   }
 }

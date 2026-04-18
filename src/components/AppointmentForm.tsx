@@ -276,12 +276,6 @@ export default function AppointmentForm() {
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
                       <Label htmlFor="service" className="text-maroon font-medium">Service</Label>
-                      {selectedService && (
-                        <div className="flex items-center text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full ring-1 ring-green-100">
-                          <Coins className="w-3 h-3 mr-1 fill-current" />
-                          +{Math.floor((parseInt(selectedService.price.replace(/[^0-9]/g, '')) || 0) * 0.1)} Points
-                        </div>
-                      )}
                     </div>
                     
                     <Select 
