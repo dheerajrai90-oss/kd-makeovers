@@ -9,27 +9,27 @@ import { Camera, Maximize2 } from 'lucide-react';
 
 const DEFAULT_GALLERY: GalleryItem[] = [
   {
-    url: 'https://images.unsplash.com/photo-1595152248441-c3a8d4469040?q=80&w=800&auto=format&fit=crop',
-    title: 'Traditional Bridal Look',
+    url: 'https://images.pexels.com/photos/34955446/pexels-photo-34955446.jpeg?auto=compress&cs=tinysrgb&w=800',
+    title: 'Traditional Bridal Elegance',
     category: 'Bridal',
     createdAt: new Date()
   },
   {
-    url: 'https://images.unsplash.com/photo-1594465919760-441fe5908ab0?q=80&w=800&auto=format&fit=crop',
-    title: 'Modern Reception Makeup',
+    url: 'https://images.pexels.com/photos/32917374/pexels-photo-32917374.jpeg?auto=compress&cs=tinysrgb&w=800',
+    title: 'Bridal Henna & Floral Art',
+    category: 'Bridal',
+    createdAt: new Date()
+  },
+  {
+    url: 'https://images.pexels.com/photos/33945853/pexels-photo-33945853.jpeg?auto=compress&cs=tinysrgb&w=800',
+    title: 'Professional Artistry',
     category: 'Makeup',
     createdAt: new Date()
   },
   {
-    url: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?q=80&w=800&auto=format&fit=crop',
-    title: 'Elegant Hair Styling',
+    url: 'https://images.pexels.com/photos/8065441/pexels-photo-8065441.jpeg?auto=compress&cs=tinysrgb&w=800',
+    title: 'Hair Styling Excellence',
     category: 'Hair',
-    createdAt: new Date()
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=800&auto=format&fit=crop',
-    title: 'Party Glow',
-    category: 'Makeup',
     createdAt: new Date()
   }
 ];

@@ -4,6 +4,7 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
+import { Button } from '@/components/ui/button';
 import Services from './components/Services';
 import Offers from './components/Offers';
 import Gallery from './components/Gallery';

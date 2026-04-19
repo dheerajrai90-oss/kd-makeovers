@@ -3,17 +3,16 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { db, auth, signInWithGoogle } from '@/src/firebase';
-import { collection, addDoc, serverTimestamp, onSnapshot, query, doc, updateDoc, increment } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, onSnapshot, query, doc } from 'firebase/firestore';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Calendar as CalendarIcon, Clock, User, Phone, Sparkles, MessageCircle, Coins, LogIn } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, User, Phone, Sparkles, MessageCircle, LogIn } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Service, UserProfile } from '@/src/types';
 
@@ -79,7 +78,6 @@ export default function AppointmentForm() {
   const [services, setServices] = useState<Service[]>(DEFAULT_SERVICES);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [redeemPoints, setRedeemPoints] = useState(false);
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
 
   useEffect(() => {
@@ -131,12 +129,6 @@ export default function AppointmentForm() {
       if (s) {
         setSelectedService(s);
         setValue('serviceName', s.name);
-        
-        // Reset redemption if price is below threshold
-        const price = parseInt(s.price.replace(/[^0-9]/g, '')) || 0;
-        if (price < 500) {
-          setRedeemPoints(false);
-        }
       }
     }
   }, [watchServiceId, services, setValue]);
@@ -151,8 +143,6 @@ export default function AppointmentForm() {
         ? parseInt(selectedService.price.replace(/[^0-9]/g, '')) || 0 
         : 0;
 
-      const pointsToUse = redeemPoints && userProfile ? userProfile.loyaltyPoints : 0;
-
       await addDoc(collection(db, 'appointments'), {
         name: data.name,
         phone: data.phone,
@@ -162,22 +152,13 @@ export default function AppointmentForm() {
         time: data.time,
         notes: data.notes || '',
         price: numericPrice,
-        pointsUsed: pointsToUse,
+        pointsUsed: 0,
         userId: userId || null,
         status: 'pending',
         createdAt: serverTimestamp(),
       });
 
-      if (pointsToUse > 0 && userId) {
-        // Mark points as "reserved" or just deduct now for simplicity
-        const userRef = doc(db, 'userProfiles', userId);
-        await updateDoc(userRef, {
-          loyaltyPoints: increment(-pointsToUse),
-          updatedAt: serverTimestamp()
-        });
-      }
-
-      toast.success('Appointment booked successfully! Your points have been applied as a discount.');
+      toast.success('Appointment booked successfully!');
       reset();
       setSelectedService(null);
     } catch (error) {
@@ -305,45 +286,6 @@ export default function AppointmentForm() {
                     </Select>
                     {errors.serviceId && <p className="text-red-500 text-xs mt-1">{errors.serviceId.message}</p>}
                   </div>
-
-                  {userProfile && userProfile.loyaltyPoints > 0 && (
-                    <motion.div 
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      className="bg-gold/5 border border-gold/20 rounded-lg p-4"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center text-sm font-bold text-maroon">
-                          <Coins className="w-4 h-4 mr-2 text-gold fill-current" />
-                          Rewards Balance: {userProfile.loyaltyPoints} Points
-                        </div>
-                        {selectedService && (parseInt(selectedService.price.replace(/[^0-9]/g, '')) || 0) >= 500 ? (
-                          <button
-                            type="button"
-                            onClick={() => setRedeemPoints(!redeemPoints)}
-                            className={`text-xs font-bold px-3 py-1 rounded-full transition-all ${
-                              redeemPoints 
-                                ? 'bg-maroon text-white shadow-md' 
-                                : 'bg-gold/20 text-maroon border border-maroon/20 hover:bg-gold/30'
-                            }`}
-                          >
-                            {redeemPoints ? '✓ Redeeming' : 'Redeem for ₹' + userProfile.loyaltyPoints + ' off'}
-                          </button>
-                        ) : (
-                          <Badge variant="outline" className="text-[10px] border-maroon/20 text-maroon/50 bg-white">
-                            Min. ₹500 needed
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-[10px] text-gray-500 italic">
-                        {selectedService && (parseInt(selectedService.price.replace(/[^0-9]/g, '')) || 0) < 500
-                          ? "Note: Points can only be redeemed on services worth ₹500 or more."
-                          : redeemPoints 
-                            ? "Great choice! These points will be applied as a discount on your final bill." 
-                            : "You have points available! Use them to get a direct discount on this booking."}
-                      </p>
-                    </motion.div>
-                  )}
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">

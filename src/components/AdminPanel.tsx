@@ -27,6 +27,7 @@ export default function AdminPanel() {
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
   const [offers, setOffers] = useState<Offer[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
+  const [userSearch, setUserSearch] = useState('');
   
   const [isUploading, setIsUploading] = useState(false);
   const [newService, setNewService] = useState({ name: '', description: '', price: '', category: 'Makeup' });
@@ -153,6 +154,55 @@ export default function AdminPanel() {
     }
   };
 
+  const redeemPointsForAppointment = async (id: string) => {
+    try {
+      const appRef = doc(db, 'appointments', id);
+      const appSnap = await getDoc(appRef);
+      const appData = appSnap.data() as Appointment;
+
+      if (!appData.userId) {
+        toast.error('Guest users do not have loyalty points');
+        return;
+      }
+
+      if (appData.pointsUsed && appData.pointsUsed > 0) {
+        toast.error('Points already redeemed for this appointment');
+        return;
+      }
+
+      const userRef = doc(db, 'userProfiles', appData.userId);
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists()) {
+        toast.error('User profile not found');
+        return;
+      }
+
+      const userData = userSnap.data() as UserProfile;
+      const pointsToRedeem = userData.loyaltyPoints;
+
+      if (pointsToRedeem <= 0) {
+        toast.error('User has no loyalty points to redeem');
+        return;
+      }
+
+      // Cap redemption at appointment price if needed, but per previous logic users get ₹1 per point
+      const discount = pointsToRedeem;
+      
+      await updateDoc(userRef, {
+        loyaltyPoints: 0, // Deduct all points
+        updatedAt: serverTimestamp()
+      });
+
+      await updateDoc(appRef, {
+        pointsUsed: discount,
+      });
+
+      toast.success(`Successfully redeemed ${pointsToRedeem} points (₹${discount} discount)`);
+    } catch (e: any) {
+      toast.error(`Error: ${e.message}`);
+    }
+  };
+
   // Service Actions
   const handleAddService = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -237,6 +287,19 @@ export default function AdminPanel() {
   };
 
   // User Actions
+  const redeemUserPoints = async (uid: string, points: number) => {
+    if (!confirm(`Are you sure you want to redeem all ${points} points for this customer?`)) return;
+    try {
+      await updateDoc(doc(db, 'userProfiles', uid), {
+        loyaltyPoints: 0,
+        updatedAt: serverTimestamp()
+      });
+      toast.success(`Successfully redeemed ${points} points`);
+    } catch (e: any) {
+      toast.error(`Error redeeming points: ${e.message}`);
+    }
+  };
+
   const adjustPoints = async (uid: string, amount: number) => {
     try {
       await updateDoc(doc(db, 'userProfiles', uid), {
@@ -391,6 +454,17 @@ export default function AdminPanel() {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">
+                              {app.userId && (!app.pointsUsed || app.pointsUsed === 0) && (
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="text-gold border-gold/30 hover:bg-gold/10"
+                                  onClick={() => redeemPointsForAppointment(app.id!)}
+                                  title="Redeem User's Points"
+                                >
+                                  <Coins className="w-4 h-4" />
+                                </Button>
+                              )}
                               {app.status === 'pending' && (
                                 <>
                                   <Button size="sm" variant="outline" className="text-green-600 border-green-200 hover:bg-green-50" onClick={() => updateAppointmentStatus(app.id!, 'confirmed')}>
@@ -700,11 +774,20 @@ export default function AdminPanel() {
           {/* Users Tab */}
           <TabsContent value="users">
             <Card className="border-none shadow-xl">
-              <CardHeader>
+              <CardHeader className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <CardTitle className="text-maroon flex items-center">
                   <Users className="w-5 h-5 mr-2" />
                   Manage Customer Loyalty
                 </CardTitle>
+                <div className="relative w-full md:w-64">
+                  <Input 
+                    placeholder="Search customers..." 
+                    value={userSearch}
+                    onChange={(e) => setUserSearch(e.target.value)}
+                    className="pl-10"
+                  />
+                  <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
@@ -715,55 +798,63 @@ export default function AdminPanel() {
                         <TableHead>Email</TableHead>
                         <TableHead>Total Spent</TableHead>
                         <TableHead>Current Points</TableHead>
-                        <TableHead className="text-right">Adjust Points</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {users.map((u) => (
+                      {users
+                        .filter(u => 
+                          u.displayName?.toLowerCase().includes(userSearch.toLowerCase()) || 
+                          u.email?.toLowerCase().includes(userSearch.toLowerCase())
+                        )
+                        .map((u) => (
                         <TableRow key={u.uid}>
                           <TableCell className="font-medium">{u.displayName || 'Anonymous'}</TableCell>
                           <TableCell className="text-gray-500">{u.email}</TableCell>
                           <TableCell>₹{u.totalSpent?.toLocaleString() || 0}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              <Coins className="w-4 h-4 text-gold fill-current" />
-                              <span className="font-bold text-maroon text-lg">{u.loyaltyPoints || 0}</span>
+                              <Coins className="w-5 h-5 text-gold fill-current" />
+                              <span className="font-bold text-maroon text-xl">{u.loyaltyPoints || 0}</span>
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="text-red-600 border-red-200 hover:bg-red-50"
-                                onClick={() => adjustPoints(u.uid, -10)}
-                              >
-                                -10
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="text-red-600 border-red-200 hover:bg-red-50"
-                                onClick={() => adjustPoints(u.uid, -50)}
-                              >
-                                -50
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="text-green-600 border-green-200 hover:bg-green-50"
-                                onClick={() => adjustPoints(u.uid, 50)}
-                              >
-                                +50
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="text-green-600 border-green-200 hover:bg-green-50"
-                                onClick={() => adjustPoints(u.uid, 100)}
-                              >
-                                +100
-                              </Button>
+                            <div className="flex flex-col items-end gap-2">
+                              <div className="flex gap-1">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="h-7 px-2 text-[10px] text-red-600 border-red-200 hover:bg-red-50"
+                                  onClick={() => adjustPoints(u.uid, -10)}
+                                >
+                                  -10
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="h-7 px-2 text-[10px] text-red-600 border-red-200 hover:bg-red-50"
+                                  onClick={() => adjustPoints(u.uid, -50)}
+                                >
+                                  -50
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="h-7 px-2 text-[10px] text-green-600 border-green-200 hover:bg-green-50"
+                                  onClick={() => adjustPoints(u.uid, 50)}
+                                >
+                                  +50
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="h-7 px-10 text-xs bg-maroon text-white hover:bg-maroon/90 font-bold"
+                                  onClick={() => redeemUserPoints(u.uid, u.loyaltyPoints)}
+                                  disabled={!u.loyaltyPoints || u.loyaltyPoints <= 0}
+                                >
+                                  REDEEM ALL
+                                </Button>
+                              </div>
                             </div>
                           </TableCell>
                         </TableRow>

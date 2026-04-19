@@ -8,8 +8,8 @@ export default function Hero() {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <img
-          src="https://images.unsplash.com/photo-1595152248441-c3a8d4469040?q=80&w=2000&auto=format&fit=crop"
-          alt="Indian Bridal Makeup"
+          src="https://lh3.googleusercontent.com/p/AF1QipNqr80YkWVW1KRDl1qLILPMmMCGe8nwRikSwMY8=s1600"
+          alt="KD Makeovers Premium Studio"
           className="w-full h-full object-cover"
           referrerPolicy="no-referrer"
         />
