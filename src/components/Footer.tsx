@@ -22,7 +22,7 @@ export default function Footer() {
                 <div className="w-12 h-0.5 bg-gold/30 mt-1" />
               </div>
             </div>
-            <p className="text-soft-pink/70 max-w-md mb-8 leading-relaxed">
+            <p className="text-soft-pink/70 max-w-md mb-8 leading-relaxed text-center md:text-left mx-auto md:mx-0">
               Premium Indian bridal makeup and cosmetics services in Delhi. 
               We believe every bride deserves to look her best on her special day. 
               Our expert team led by Komal Kumari is dedicated to making your beauty dreams come true.
