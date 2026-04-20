@@ -3,6 +3,7 @@ import { db, storage, auth } from '@/src/firebase';
 import { 
   collection, onSnapshot, query, orderBy, updateDoc, doc, deleteDoc, addDoc, serverTimestamp, getDoc, increment 
 } from 'firebase/firestore';
+import logoImg from '@/src/assets/logo.png';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Appointment, Service, Review, GalleryItem, Offer, UserProfile } from '@/src/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -337,10 +338,9 @@ export default function AdminPanel() {
           <div className="relative mx-auto mb-6 w-24 h-24">
             <div className="absolute -inset-1 bg-gold/20 rounded-full blur-sm" />
             <img 
-              src="/logo.png" 
+              src={logoImg} 
               alt="KD Makeovers" 
               className="relative h-24 w-24 rounded-full object-cover border-2 border-gold shadow-md" 
-              referrerPolicy="no-referrer"
             />
           </div>
           <X className="w-12 h-12 text-red-500 mx-auto mb-4" />
