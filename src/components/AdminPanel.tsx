@@ -337,7 +337,7 @@ export default function AdminPanel() {
           <div className="relative mx-auto mb-6 w-24 h-24">
             <div className="absolute -inset-1 bg-gold/20 rounded-full blur-sm" />
             <img 
-              src="/src/assets/logo.png" 
+              src="/logo.png" 
               alt="KD Makeovers" 
               className="relative h-24 w-24 rounded-full object-cover border-2 border-gold shadow-md" 
               referrerPolicy="no-referrer"

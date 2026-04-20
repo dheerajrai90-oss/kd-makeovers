@@ -77,7 +77,7 @@ export default function Navbar() {
               <div className="relative">
                 <div className="absolute -inset-1 bg-gold/20 rounded-full blur-sm group-hover:bg-gold/40 transition-colors" />
                 <img 
-                  src="/src/assets/logo.png" 
+                  src="/logo.png" 
                   alt="KD Makeovers Logo" 
                   className="relative h-10 w-10 sm:h-14 sm:w-14 rounded-full object-cover border border-gold sm:border-2 shadow-md group-hover:scale-105 transition-transform"
                   referrerPolicy="no-referrer"

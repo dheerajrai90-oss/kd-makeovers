@@ -53,7 +53,7 @@ export default function App() {
           <div className="relative mb-6">
             <div className="absolute -inset-2 bg-gold/10 rounded-full blur-xl" />
             <img 
-              src="/src/assets/logo.png" 
+              src="/logo.png" 
               alt="KD Makeovers" 
               className="relative h-32 w-32 rounded-full object-cover border-4 border-gold shadow-2xl" 
               referrerPolicy="no-referrer"

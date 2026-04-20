@@ -11,7 +11,7 @@ export default function Footer() {
               <div className="relative">
                 <div className="absolute -inset-1 bg-gold/10 rounded-full blur-md group-hover:bg-gold/20 transition-colors" />
                 <img 
-                  src="/src/assets/logo.png" 
+                  src="/logo.png" 
                   alt="KD Makeovers Logo" 
                   className="relative h-24 w-24 rounded-full object-cover border-2 border-gold/40 p-1 bg-maroon/20 transition-transform group-hover:scale-105"
                   referrerPolicy="no-referrer"
