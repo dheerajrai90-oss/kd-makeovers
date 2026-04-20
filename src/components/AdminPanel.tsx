@@ -3,7 +3,6 @@ import { db, storage, auth } from '@/src/firebase';
 import { 
   collection, onSnapshot, query, orderBy, updateDoc, doc, deleteDoc, addDoc, serverTimestamp, getDoc, increment 
 } from 'firebase/firestore';
-import logoImg from '@/src/assets/logo.png';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Appointment, Service, Review, GalleryItem, Offer, UserProfile } from '@/src/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -335,14 +334,6 @@ export default function AdminPanel() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-soft-pink p-4">
         <Card className="p-8 text-center max-w-md shadow-2xl border-maroon/10">
-          <div className="relative mx-auto mb-6 w-24 h-24">
-            <div className="absolute -inset-1 bg-gold/20 rounded-full blur-sm" />
-            <img 
-              src={logoImg} 
-              alt="KD Makeovers" 
-              className="relative h-24 w-24 rounded-full object-cover border-2 border-gold shadow-md" 
-            />
-          </div>
           <X className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-serif font-bold text-maroon mb-2">Access Denied</h2>
           <p className="text-gray-600 mb-6">Please login with an admin account to access this panel.</p>

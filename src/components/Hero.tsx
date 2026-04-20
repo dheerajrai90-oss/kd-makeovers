@@ -4,7 +4,7 @@ import { Sparkles, MessageCircle } from 'lucide-react';
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center pt-24 sm:pt-32 overflow-hidden">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <img

@@ -1,6 +1,5 @@
 import { Instagram, Facebook, MessageCircle, MapPin, Phone, Mail } from 'lucide-react';
 import { motion } from 'motion/react';
-import logoImg from '@/src/assets/logo.png';
 
 export default function Footer() {
   return (
@@ -9,14 +8,6 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           <div className="md:col-span-2 flex flex-col items-center md:items-start text-center md:text-left">
             <div className="flex flex-col md:flex-row items-center gap-5 mb-8 group w-full justify-center md:justify-start">
-              <div className="relative">
-                <div className="absolute -inset-1 bg-gold/10 rounded-full blur-md group-hover:bg-gold/20 transition-colors" />
-                <img 
-                  src={logoImg} 
-                  alt="KD Makeovers Logo" 
-                  className="relative h-24 w-24 rounded-full object-cover border-2 border-gold/40 p-1 bg-maroon/20 transition-transform group-hover:scale-105"
-                />
-              </div>
               <div className="flex flex-col items-center md:items-start">
                 <h2 className="text-3xl font-serif font-bold text-gold tracking-tight">KD Makeovers & Cosmetics</h2>
                 <div className="w-12 h-0.5 bg-gold/30 mt-1" />

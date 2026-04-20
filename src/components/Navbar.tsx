@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Menu, X, LogIn, LogOut, User as UserIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
-import logoImg from '@/src/assets/logo.png';
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
@@ -49,7 +48,7 @@ export default function Navbar() {
         setIsMenuOpen(false);
         // Small delay to allow menu animation to start closing
         setTimeout(() => {
-          const navHeight = 64; // h-16 = 64px
+          const navHeight = 84; // Matches the new h-20/h-24 navbar
           const elementPosition = element.getBoundingClientRect().top;
           const offsetPosition = elementPosition + window.pageYOffset - navHeight;
 
@@ -70,24 +69,16 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] bg-white/80 backdrop-blur-md border-b border-maroon/10">
+    <nav className="fixed top-0 left-0 right-0 z-[100] bg-white/90 backdrop-blur-md border-b border-maroon/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
+        <div className="flex justify-between items-center h-20 sm:h-24">
           <div className="flex-shrink-0 flex items-center">
-            <a href="#" onClick={(e) => handleNavClick(e, '#')} className="flex items-center gap-2 sm:gap-3 group">
-              <div className="relative">
-                <div className="absolute -inset-1 bg-gold/20 rounded-full blur-sm group-hover:bg-gold/40 transition-colors" />
-                <img 
-                  src={logoImg} 
-                  alt="KD Makeovers Logo" 
-                  className="relative h-10 w-10 sm:h-14 sm:w-14 rounded-full object-cover border border-gold sm:border-2 shadow-md group-hover:scale-105 transition-transform"
-                />
-              </div>
+            <a href="#" onClick={(e) => handleNavClick(e, '#')} className="flex items-center group">
               <div className="flex flex-col">
-                <span className="text-base sm:text-xl font-serif font-bold text-maroon tracking-tight leading-none">
-                  KD <span className="text-gold">Makeovers</span>
+                <span className="text-2xl sm:text-4xl font-serif font-bold text-maroon tracking-tighter leading-none group-hover:text-gold transition-colors duration-300">
+                  KD <span className="text-gold group-hover:text-maroon transition-colors duration-300">Makeovers</span>
                 </span>
-                <span className="text-[8px] sm:text-[10px] uppercase tracking-[0.1em] sm:tracking-[0.2em] text-gray-500 font-medium">Redefine Beauty</span>
+                <span className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] text-gray-500 font-semibold mt-1">Redefine Beauty</span>
               </div>
             </a>
           </div>
@@ -99,25 +90,24 @@ export default function Navbar() {
                 key={link.name}
                 href={link.href}
                 onClick={(e) => handleNavClick(e, link.href)}
-                className="text-sm font-medium text-gray-700 hover:text-maroon transition-colors"
+                className="text-sm font-semibold text-gray-700 hover:text-maroon transition-colors uppercase tracking-wider"
               >
                 {link.name}
               </a>
             ))}
             {user ? (
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                  <UserIcon className="w-4 h-4" />
-                  <span className="max-w-[100px] truncate">{user.displayName || 'Customer'}</span>
+              <div className="flex items-center gap-4 border-l border-maroon/10 pl-8">
+                <div className="flex flex-col items-end">
+                  <span className="text-[10px] text-gray-500 uppercase font-bold tracking-tighter">Welcome</span>
+                  <span className="text-xs font-bold text-maroon">{user.displayName || 'Customer'}</span>
                 </div>
-                <Button variant="ghost" size="sm" onClick={logout} className="text-maroon">
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Logout
+                <Button variant="outline" size="icon" className="rounded-full h-10 w-10 border-maroon/20 hover:bg-maroon hover:text-white transition-all" onClick={logout}>
+                  <LogOut className="w-4 h-4" />
                 </Button>
               </div>
             ) : (
-              <Button size="sm" onClick={handleLogin} className="bg-maroon text-white hover:bg-maroon/90 font-bold">
-                <LogIn className="w-4 h-4 mr-2" />
+              <Button size="lg" onClick={handleLogin} className="bg-maroon text-white hover:bg-maroon/90 font-bold px-6 h-12">
+                <LogIn className="w-5 h-5 mr-2" />
                 Customer Login
               </Button>
             )}
@@ -127,9 +117,9 @@ export default function Navbar() {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 hover:text-maroon"
+              className="text-gray-700 hover:text-maroon p-2"
             >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMenuOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
             </button>
           </div>
         </div>
