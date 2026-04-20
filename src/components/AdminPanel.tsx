@@ -52,26 +52,44 @@ export default function AdminPanel() {
 
     const unsubAppointments = onSnapshot(query(collection(db, 'appointments'), orderBy('createdAt', 'desc')), (snap) => {
       setAppointments(snap.docs.map(d => ({ id: d.id, ...d.data() } as Appointment)));
+    }, (error) => {
+      console.error("Appointments listener error:", error);
+      if (error.code === 'permission-denied') {
+        toast.error("Permission denied to view appointments");
+      }
     });
 
     const unsubServices = onSnapshot(query(collection(db, 'services')), (snap) => {
       setServices(snap.docs.map(d => ({ id: d.id, ...d.data() } as Service)));
+    }, (error) => {
+      console.error("Services listener error:", error);
     });
 
     const unsubReviews = onSnapshot(query(collection(db, 'reviews'), orderBy('createdAt', 'desc')), (snap) => {
       setReviews(snap.docs.map(d => ({ id: d.id, ...d.data() } as Review)));
+    }, (error) => {
+      console.error("Reviews listener error:", error);
     });
 
     const unsubGallery = onSnapshot(query(collection(db, 'gallery'), orderBy('createdAt', 'desc')), (snap) => {
       setGallery(snap.docs.map(d => ({ id: d.id, ...d.data() } as GalleryItem)));
+    }, (error) => {
+      console.error("Gallery listener error:", error);
     });
 
     const unsubOffers = onSnapshot(query(collection(db, 'offers'), orderBy('createdAt', 'desc')), (snap) => {
       setOffers(snap.docs.map(d => ({ id: d.id, ...d.data() } as Offer)));
+    }, (error) => {
+      console.error("Offers listener error:", error);
     });
 
     const unsubUsers = onSnapshot(query(collection(db, 'userProfiles')), (snap) => {
       setUsers(snap.docs.map(d => ({ uid: d.id, ...d.data() } as any as UserProfile)));
+    }, (error) => {
+      console.error("Users listener error:", error);
+      if (error.code === 'permission-denied') {
+        toast.error("Permission denied to view user profiles");
+      }
     });
 
     return () => {
@@ -314,11 +332,23 @@ export default function AdminPanel() {
 
   if (!auth.currentUser || (auth.currentUser.email !== 'komalbsc@gmail.com' && auth.currentUser.email !== 'dheeraj.rai90@gmail.com')) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-soft-pink">
-        <Card className="p-8 text-center max-w-md">
+      <div className="min-h-screen flex items-center justify-center bg-soft-pink p-4">
+        <Card className="p-8 text-center max-w-md shadow-2xl border-maroon/10">
+          <div className="relative mx-auto mb-6 w-24 h-24">
+            <div className="absolute -inset-1 bg-gold/20 rounded-full blur-sm" />
+            <img 
+              src="/src/assets/logo.png" 
+              alt="KD Makeovers" 
+              className="relative h-24 w-24 rounded-full object-cover border-2 border-gold shadow-md" 
+              referrerPolicy="no-referrer"
+            />
+          </div>
           <X className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-serif font-bold text-maroon mb-2">Access Denied</h2>
-          <p className="text-gray-600">Please login with an admin account to access this panel.</p>
+          <p className="text-gray-600 mb-6">Please login with an admin account to access this panel.</p>
+          <Button variant="outline" className="w-full" asChild>
+            <a href="#">Return to Home</a>
+          </Button>
         </Card>
       </div>
     );

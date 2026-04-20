@@ -6,7 +6,13 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return isAuthenticated() && (request.auth.token.email == "dheeraj.rai90@gmail.com" || request.auth.token.email == "komalbsc@gmail.com");
+      return isAuthenticated() && 
+        (request.auth.token.email == "dheeraj.rai90@gmail.com" || 
+         request.auth.token.email == "komalbsc@gmail.com");
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
     }
 
     match /appointments/{appointmentId} {
@@ -16,9 +22,9 @@ service cloud.firestore {
     }
 
     match /userProfiles/{uid} {
-      allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == uid);
-      allow create: if isAuthenticated() && request.auth.uid == uid && request.resource.data.loyaltyPoints == 0;
-      allow update: if isAdmin();
+      allow read: if isAdmin() || isOwner(uid);
+      allow create: if isOwner(uid) && request.resource.data.loyaltyPoints == 0;
+      allow update: if isAdmin() || (isOwner(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'updatedAt']));
     }
 
     match /services/{serviceId} {
@@ -28,7 +34,7 @@ service cloud.firestore {
 
     match /reviews/{reviewId} {
       allow create: if true;
-      allow read: if resource.data.approved == true || isAdmin();
+      allow read: if isAdmin() || resource.data.approved == true;
       allow update, delete: if isAdmin();
     }
 
@@ -40,6 +46,11 @@ service cloud.firestore {
     match /offers/{offerId} {
       allow read: if true;
       allow write: if isAdmin();
+    }
+    
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

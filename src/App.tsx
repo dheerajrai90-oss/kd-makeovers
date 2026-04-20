@@ -12,6 +12,7 @@ import Reviews from './components/Reviews';
 import AppointmentForm from './components/AppointmentForm';
 import UserAppointments from './components/UserAppointments';
 import AdminPanel from './components/AdminPanel';
+import Location from './components/Location';
 import Footer from './components/Footer';
 import { Toaster } from '@/components/ui/sonner';
 
@@ -49,8 +50,18 @@ export default function App() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-soft-pink">
         <div className="animate-pulse flex flex-col items-center">
-          <div className="text-4xl font-serif font-bold text-maroon mb-4">KD Makeovers</div>
-          <div className="w-12 h-1 bg-gold rounded-full"></div>
+          <div className="relative mb-6">
+            <div className="absolute -inset-2 bg-gold/10 rounded-full blur-xl" />
+            <img 
+              src="/src/assets/logo.png" 
+              alt="KD Makeovers" 
+              className="relative h-32 w-32 rounded-full object-cover border-4 border-gold shadow-2xl" 
+              referrerPolicy="no-referrer"
+            />
+          </div>
+          <div className="text-4xl font-serif font-bold text-maroon mb-2">KD Makeovers</div>
+          <div className="text-[10px] uppercase tracking-[0.3em] text-maroon/60 font-medium mb-6">Redefine Beauty</div>
+          <div className="w-16 h-1 bg-gold rounded-full"></div>
         </div>
       </div>
     );
@@ -68,6 +79,7 @@ export default function App() {
         <AppointmentForm />
         {user && !isAdmin && <UserAppointments />}
         {isAdmin && <AdminPanel />}
+        <Location />
       </main>
       <Footer />
       <Toaster position="top-center" expand={true} richColors />

@@ -35,6 +35,7 @@ export default function Navbar() {
     { name: 'Services', href: '#services' },
     { name: 'Offers', href: '#offers' },
     { name: 'Gallery', href: '#gallery' },
+    { name: 'Location', href: '#location' },
     ...(user && !isAdmin ? [{ name: 'My Bookings', href: '#my-bookings' }] : []),
     ...(isAdmin ? [{ name: 'Admin', href: '#admin' }] : []),
   ];
@@ -72,9 +73,23 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex-shrink-0 flex items-center">
-            <span className="text-2xl font-serif font-bold text-maroon tracking-tight">
-              KD <span className="text-gold">Makeovers</span>
-            </span>
+            <a href="#" onClick={(e) => handleNavClick(e, '#')} className="flex items-center gap-2 sm:gap-3 group">
+              <div className="relative">
+                <div className="absolute -inset-1 bg-gold/20 rounded-full blur-sm group-hover:bg-gold/40 transition-colors" />
+                <img 
+                  src="/src/assets/logo.png" 
+                  alt="KD Makeovers Logo" 
+                  className="relative h-10 w-10 sm:h-14 sm:w-14 rounded-full object-cover border border-gold sm:border-2 shadow-md group-hover:scale-105 transition-transform"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-base sm:text-xl font-serif font-bold text-maroon tracking-tight leading-none">
+                  KD <span className="text-gold">Makeovers</span>
+                </span>
+                <span className="text-[8px] sm:text-[10px] uppercase tracking-[0.1em] sm:tracking-[0.2em] text-gray-500 font-medium">Redefine Beauty</span>
+              </div>
+            </a>
           </div>
 
           {/* Desktop Menu */}
