@@ -4,7 +4,6 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import logoImg from '@/src/assets/logo.png';
 import { Button } from '@/components/ui/button';
 import Services from './components/Services';
 import Offers from './components/Offers';
@@ -54,9 +53,10 @@ export default function App() {
           <div className="relative mb-6">
             <div className="absolute -inset-2 bg-gold/10 rounded-full blur-xl" />
             <img 
-              src={logoImg} 
+              src="/logo.png" 
               alt="KD Makeovers" 
               className="relative h-32 w-32 rounded-full object-cover border-4 border-gold shadow-2xl" 
+              referrerPolicy="no-referrer"
             />
           </div>
           <div className="text-4xl font-serif font-bold text-maroon mb-2">KD Makeovers</div>

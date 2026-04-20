@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Menu, X, LogIn, LogOut, User as UserIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
-import logoImg from '@/src/assets/logo.png';
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
@@ -78,9 +77,10 @@ export default function Navbar() {
               <div className="relative">
                 <div className="absolute -inset-1 bg-gold/20 rounded-full blur-sm group-hover:bg-gold/40 transition-colors" />
                 <img 
-                  src={logoImg} 
+                  src="/logo.png" 
                   alt="KD Makeovers Logo" 
                   className="relative h-10 w-10 sm:h-14 sm:w-14 rounded-full object-cover border border-gold sm:border-2 shadow-md group-hover:scale-105 transition-transform"
+                  referrerPolicy="no-referrer"
                 />
               </div>
               <div className="flex flex-col">
