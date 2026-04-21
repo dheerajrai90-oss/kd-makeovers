@@ -6,14 +6,15 @@ export default function Hero() {
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-24 sm:pt-32 overflow-hidden">
       {/* Background Image with Overlay */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
+      <div className="absolute inset-0 z-0 pointer-events-none bg-maroon">
         <img
           src="https://lh3.googleusercontent.com/p/AF1QipNqr80YkWVW1KRDl1qLILPMmMCGe8nwRikSwMY8=s1600"
           alt="KD Makeovers Premium Studio"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover brightness-[0.6] contrast-[1.1] transition-all duration-1000"
           referrerPolicy="no-referrer"
+          onLoad={(e) => (e.currentTarget.style.opacity = '1')}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-maroon/80 to-maroon/40 mix-blend-multiply" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/70" />
       </div>
 
       <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left">

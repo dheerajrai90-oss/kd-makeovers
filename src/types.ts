@@ -28,6 +28,7 @@ export interface Service {
   description: string;
   price: string;
   category: string;
+  imageUrl?: string;
 }
 
 export interface Review {

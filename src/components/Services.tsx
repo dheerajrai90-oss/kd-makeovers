@@ -12,37 +12,43 @@ const DEFAULT_SERVICES: Service[] = [
     name: 'Bridal Makeup',
     description: 'Complete bridal transformation including hair styling, draping, and premium HD makeup.',
     price: '₹10,000 onwards',
-    category: 'Bridal'
+    category: 'Bridal',
+    imageUrl: 'https://images.pexels.com/photos/30452324/pexels-photo-30452324.jpeg?auto=compress&cs=tinysrgb&w=800'
   },
   {
     name: 'Party Makeup',
     description: 'Elegant and sophisticated look for parties, weddings, and special events.',
     price: '₹1,200 onwards',
-    category: 'Makeup'
+    category: 'Makeup',
+    imageUrl: 'https://images.pexels.com/photos/324655/pexels-photo-324655.jpeg?auto=compress&cs=tinysrgb&w=800'
   },
   {
     name: 'Engagement Makeup',
     description: 'Soft and glowing look tailored for your engagement ceremony.',
     price: '₹7,000 onwards',
-    category: 'Bridal'
+    category: 'Bridal',
+    imageUrl: 'https://images.pexels.com/photos/34037599/pexels-photo-34037599.jpeg?auto=compress&cs=tinysrgb&w=800'
   },
   {
     name: 'Hair Styling',
     description: 'Professional hair styling from traditional buns to modern waves.',
     price: '₹500 onwards',
-    category: 'Hair'
+    category: 'Hair',
+    imageUrl: 'https://images.pexels.com/photos/28994569/pexels-photo-28994569.jpeg?auto=compress&cs=tinysrgb&w=800'
   },
   {
     name: 'Beauty Service',
     description: 'General beauty treatments including cleanup, threading, and waxing.',
-    price: '',
-    category: 'Beauty'
+    price: 'On Request',
+    category: 'Beauty',
+    imageUrl: 'https://images.pexels.com/photos/18809795/pexels-photo-18809795.jpeg?auto=compress&cs=tinysrgb&w=800'
   },
   {
     name: 'Others',
     description: 'Have a specific request? We provide custom beauty services on demand.',
     price: 'Flexible',
-    category: 'Other'
+    category: 'Other',
+    imageUrl: 'https://images.pexels.com/photos/3985325/pexels-photo-3985325.jpeg?auto=compress&cs=tinysrgb&w=800'
   }
 ];
 
@@ -138,16 +144,27 @@ export default function Services() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
             >
-              <Card className="h-full border-maroon/10 hover:border-gold/50 transition-all hover:shadow-xl group">
-                <CardHeader>
-                  <div className="w-12 h-12 rounded-full bg-soft-pink flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <Card className="h-full border-maroon/10 hover:border-gold/50 transition-all hover:shadow-xl group overflow-hidden">
+                {service.imageUrl && (
+                  <div className="h-48 overflow-hidden relative">
+                    <img 
+                      src={service.imageUrl} 
+                      alt={service.name} 
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute inset-0 bg-maroon/10 group-hover:bg-transparent transition-colors duration-300" />
+                  </div>
+                )}
+                <CardHeader className="relative">
+                  <div className="absolute -top-6 right-6 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                     {getIcon(service.category)}
                   </div>
-                  <CardTitle className="text-xl font-serif text-maroon">{service.name}</CardTitle>
+                  <CardTitle className="text-xl font-serif text-maroon pt-2">{service.name}</CardTitle>
                   <CardDescription className="text-gold font-medium">{service.category}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600 text-sm leading-relaxed">
+                  <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
                     {service.description}
                   </p>
                 </CardContent>
