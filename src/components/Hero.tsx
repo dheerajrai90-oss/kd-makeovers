@@ -24,9 +24,22 @@ export default function Hero() {
           transition={{ duration: 0.8 }}
           className="max-w-2xl"
         >
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-gold/20 border border-gold/30 text-gold text-sm font-medium mb-6">
-            <Sparkles className="w-4 h-4" />
-            <span>Delhi's Premium Bridal Studio</span>
+          <div className="flex flex-wrap gap-4 mb-6">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-gold/20 border border-gold/30 text-gold text-sm font-medium">
+              <Sparkles className="w-4 h-4" />
+              <span>Delhi's Premium Bridal Studio</span>
+            </div>
+            <a 
+              href="https://www.google.com/search?q=kd+makeovers+%26+cosmetics#lrd=0x390cff595fb9fcdd:0xbc93f994fe8c0caa,1,,,," 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white text-sm font-medium hover:bg-white/20 transition-all backdrop-blur-sm"
+            >
+              <img src="https://www.google.com/favicon.ico" alt="Google" className="w-3.5 h-3.5" />
+              <span className="flex items-center gap-1">
+                4.9 <span className="text-gold">★★★★★</span> (200+ Reviews)
+              </span>
+            </a>
           </div>
           <h1 className="text-5xl md:text-7xl font-serif font-bold text-white leading-tight mb-6">
             Unveil Your <span className="text-gold italic">Radiant</span> Beauty
@@ -49,9 +62,6 @@ export default function Hero() {
                 <MessageCircle className="w-5 h-5 fill-current" />
                 Chat on WhatsApp
               </a>
-            </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 font-bold text-lg h-14 px-8" asChild>
-              <a href="#gallery">View Gallery</a>
             </Button>
           </div>
         </motion.div>

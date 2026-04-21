@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 
 export default function Location() {
   const mapLink = "https://www.google.com/maps/dir/?api=1&destination=KD+Makeovers+%26+Cosmetics,+Sant+Nagar,+Delhi";
-  const mapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3498.4124958611847!2d77.1970221755!3d28.75204427559381!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd6879802d31%3A0xe1043336ba76527!2sKD%20Makeovers%20%26%20Cosmetics!5e0!3m2!1sen!2sin!4v1713575999000!5m2!1sen!2sin";
+  const mapEmbedUrl = "https://maps.google.com/maps?q=KD%20Makeovers%20%26%20Cosmetics%20Sant%20Nagar%20Delhi&t=&z=15&ie=UTF8&iwloc=&output=embed";
 
   return (
     <section id="location" className="py-24 bg-white overflow-hidden">
@@ -77,7 +77,7 @@ export default function Location() {
             className="relative"
           >
             <div className="absolute inset-0 bg-gold/10 -rotate-3 rounded-3xl -z-10 translate-x-4 translate-y-4" />
-            <div className="bg-white p-3 rounded-3xl shadow-2xl border border-maroon/10 overflow-hidden aspect-square sm:aspect-video lg:aspect-square group cursor-pointer">
+            <div className="bg-white p-3 rounded-3xl shadow-2xl border border-maroon/10 overflow-hidden aspect-square sm:aspect-video lg:aspect-square group relative">
               <iframe
                 src={mapEmbedUrl}
                 width="100%"
@@ -86,7 +86,7 @@ export default function Location() {
                 allowFullScreen={true}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                className="rounded-2xl grayscale group-hover:grayscale-0 group-active:grayscale-0 transition-all duration-700 ease-in-out"
+                className="rounded-2xl transition-all duration-700 ease-in-out"
               />
             </div>
           </motion.div>
