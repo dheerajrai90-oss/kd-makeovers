@@ -73,10 +73,19 @@ const DEFAULT_SERVICES: Service[] = [
   }
 ];
 
+const DEFAULT_COURSES = [
+  { id: 'course-makeup', name: 'Professional Makeup Artist Course', category: 'Training' },
+  { id: 'course-hair', name: 'Hair Styling Course', category: 'Training' },
+  { id: 'course-nails', name: 'Nails Art & Extensions Course', category: 'Training' },
+  { id: 'course-beautician', name: 'Professional Beautician Course', category: 'Training' },
+  { id: 'course-custom', name: 'Custom Professional Training', category: 'Training' },
+];
+
 export default function AppointmentForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [bookingType, setBookingType] = useState<'service' | 'course'>('service');
   const [services, setServices] = useState<Service[]>(DEFAULT_SERVICES);
-  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [selectedService, setSelectedService] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
 
@@ -235,7 +244,7 @@ export default function AppointmentForm() {
                 ) : null}
 
                 <form onSubmit={handleSubmit(onSubmit)} className={`space-y-6 ${!currentUser ? 'opacity-20 pointer-events-none' : ''}`}>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex flex-col sm:flex-row gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name" className="text-maroon font-medium">Full Name</Label>
                       <div className="relative">
@@ -254,37 +263,87 @@ export default function AppointmentForm() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <Label htmlFor="service" className="text-maroon font-medium">Service</Label>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                       <Label className="text-maroon font-medium">What would you like to book?</Label>
+                       <div className="flex p-1 bg-soft-pink/50 rounded-lg w-full">
+                         <button
+                           type="button"
+                           className={`flex-1 py-2 rounded-md text-sm font-bold transition-all ${bookingType === 'service' ? 'bg-maroon text-white shadow-md' : 'text-maroon hover:bg-soft-pink'}`}
+                           onClick={() => {
+                             setBookingType('service');
+                             setValue('serviceId', '');
+                             setValue('serviceName', '');
+                           }}
+                         >
+                           Studio Services
+                         </button>
+                         <button
+                           type="button"
+                           className={`flex-1 py-2 rounded-md text-sm font-bold transition-all ${bookingType === 'course' ? 'bg-maroon text-white shadow-md' : 'text-maroon hover:bg-soft-pink'}`}
+                           onClick={() => {
+                             setBookingType('course');
+                             setValue('serviceId', '');
+                             setValue('serviceName', '');
+                           }}
+                         >
+                           Professional Courses
+                         </button>
+                       </div>
                     </div>
-                    
-                    <Select 
-                      value={watchServiceId || ""} 
-                      onValueChange={(val) => setValue('serviceId', val, { shouldValidate: true })}
-                    >
-                      <SelectTrigger className="w-full border-maroon/20 focus:border-maroon h-12 bg-white text-maroon">
-                        <SelectValue placeholder="Select a service" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white border border-maroon/10 shadow-xl z-50">
-                        {services.length > 0 ? (
-                          services.map((s) => (
-                            <SelectItem 
-                              key={s.id || s.name} 
-                              value={s.id || s.name}
-                              className="focus:bg-soft-pink focus:text-maroon"
-                            >
-                              {s.name}{s.price ? ` — ${s.price}` : ''}
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <div className="p-3 text-sm text-gray-500 text-center italic">
-                            No services found.
-                          </div>
-                        )}
-                      </SelectContent>
-                    </Select>
-                    {errors.serviceId && <p className="text-red-500 text-xs mt-1">{errors.serviceId.message}</p>}
+
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <Label htmlFor="service" className="text-maroon font-medium">
+                          {bookingType === 'service' ? 'Select Service' : 'Select Course'}
+                        </Label>
+                      </div>
+                      
+                      <Select 
+                        value={watchServiceId || ""} 
+                        onValueChange={(val) => {
+                          setValue('serviceId', val, { shouldValidate: true });
+                          const source = bookingType === 'service' ? services : DEFAULT_COURSES;
+                          const found = source.find(s => s.id === val);
+                          if (found) {
+                            setValue('serviceName', found.name);
+                            setSelectedService(found);
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="w-full border-maroon/20 focus:border-maroon h-12 bg-white text-maroon">
+                          <SelectValue placeholder={bookingType === 'service' ? "Choose a beauty service" : "Choose a training course"} />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white border border-maroon/10 shadow-xl z-50">
+                          {bookingType === 'service' ? (
+                            services.length > 0 ? (
+                              services.map((s) => (
+                                <SelectItem 
+                                  key={s.id || s.name} 
+                                  value={s.id || s.name}
+                                  className="focus:bg-soft-pink focus:text-maroon"
+                                >
+                                  {s.name}{s.price ? ` — ${s.price}` : ''}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <div className="p-3 text-sm text-gray-500 text-center italic">No services found.</div>
+                            )
+                          ) : (
+                            DEFAULT_COURSES.map((c) => (
+                              <SelectItem 
+                                key={c.id} 
+                                value={c.id}
+                                className="focus:bg-soft-pink focus:text-maroon"
+                              >
+                                {c.name}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectContent>
+                      </Select>
+                      {errors.serviceId && <p className="text-red-500 text-xs mt-1">{errors.serviceId.message}</p>}
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

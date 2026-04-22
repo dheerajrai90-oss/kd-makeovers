@@ -33,6 +33,7 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Home', href: '#' },
     { name: 'Services', href: '#services' },
+    { name: 'Academy', href: '#services' }, // It scrolls to the academy section which is part of the services page
     { name: 'Offers', href: '#offers' },
     { name: 'Gallery', href: '#gallery' },
     { name: 'Location', href: '#location' },

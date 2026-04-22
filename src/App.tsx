@@ -24,19 +24,24 @@ export default function App() {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       if (u) {
-        // Sync user profile
-        const userRef = doc(db, 'userProfiles', u.uid);
-        const userSnap = await getDoc(userRef);
+        try {
+          // Sync user profile
+          const userRef = doc(db, 'userProfiles', u.uid);
+          const userSnap = await getDoc(userRef);
 
-        if (!userSnap.exists()) {
-          await setDoc(userRef, {
-            uid: u.uid,
-            email: u.email,
-            displayName: u.displayName || 'Customer',
-            loyaltyPoints: 0,
-            totalSpent: 0,
-            updatedAt: serverTimestamp()
-          });
+          if (!userSnap.exists()) {
+            await setDoc(userRef, {
+              uid: u.uid,
+              email: u.email,
+              displayName: u.displayName || 'Customer',
+              loyaltyPoints: 0,
+              totalSpent: 0,
+              updatedAt: serverTimestamp()
+            });
+          }
+        } catch (error) {
+          console.error("Failed to sync user profile with Firestore:", error);
+          // Don't block auth readiness if Firestore is unavailable
         }
       }
       setIsAuthReady(true);

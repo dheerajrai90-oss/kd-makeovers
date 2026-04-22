@@ -1,56 +1,87 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function isAuthenticated() {
-      return request.auth != null;
+    // -------------------------------------------------------------------------
+    // Phase 3: Primitive Definitions (Hardened Helpers)
+    // -------------------------------------------------------------------------
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
+    function isAdmin() { 
+      return isSignedIn() && (
+        request.auth.token.email == "dheeraj.rai90@gmail.com" || 
+        request.auth.token.email == "komalbsc@gmail.com"
+      );
+    }
+    
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    // -------------------------------------------------------------------------
+    // Global Safety Net
+    // -------------------------------------------------------------------------
+    match /{document=**} { allow read, write: if false; }
+
+    // -------------------------------------------------------------------------
+    // Diagnostic Support
+    // -------------------------------------------------------------------------
+    match /test/connection {
+      allow read: if true;
     }
 
-    function isAdmin() {
-      return isAuthenticated() && 
-        (request.auth.token.email == "dheeraj.rai90@gmail.com" || 
-         request.auth.token.email == "komalbsc@gmail.com");
-    }
+    // -------------------------------------------------------------------------
+    // Domain Rules
+    // -------------------------------------------------------------------------
 
-    function isOwner(uid) {
-      return isAuthenticated() && request.auth.uid == uid;
-    }
-
+    // 1. Appointments
     match /appointments/{appointmentId} {
-      allow create: if true;
-      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn() && 
+                    incoming().name is string &&
+                    incoming().status == 'pending' &&
+                    incoming().createdAt == request.time;
+      
+      allow read: if isAdmin() || (isSignedIn() && existing().userId == request.auth.uid);
       allow update, delete: if isAdmin();
     }
 
+    // 2. User Profiles
     match /userProfiles/{uid} {
-      allow read: if isAdmin() || isOwner(uid);
-      allow create: if isOwner(uid) && request.resource.data.loyaltyPoints == 0;
-      allow update: if isAdmin() || (isOwner(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'updatedAt']));
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid) && 
+                    incoming().loyaltyPoints == 0 &&
+                    incoming().updatedAt == request.time;
+                    
+      allow update: if isAdmin() || (
+        isOwner(uid) && 
+        incoming().loyaltyPoints == existing().loyaltyPoints &&
+        incoming().updatedAt == request.time
+      );
     }
 
+    // 3. Services
     match /services/{serviceId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
+    // 4. Reviews
     match /reviews/{reviewId} {
-      allow create: if true;
-      allow read: if isAdmin() || resource.data.approved == true;
+      allow create: if incoming().approved == false &&
+                    incoming().createdAt == request.time;
+                    
+      allow read: if isAdmin() || existing().approved == true;
       allow update, delete: if isAdmin();
     }
 
+    // 5. Gallery
     match /gallery/{itemId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
+    // 6. Offers
     match /offers/{offerId} {
       allow read: if true;
       allow write: if isAdmin();
-    }
-    
-    // Default deny
-    match /{document=**} {
-      allow read, write: if false;
     }
   }
 }

@@ -11,8 +11,8 @@ export default function Hero() {
           initial={{ scale: 1.1, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 1.5 }}
-          src="https://images.pexels.com/photos/3373739/pexels-photo-3373739.jpeg?auto=compress&cs=tinysrgb&w=1920"
-          alt="Premium Makeup Collection"
+          src="https://images.pexels.com/photos/10351239/pexels-photo-10351239.jpeg?auto=compress&cs=tinysrgb&w=1920"
+          alt="Exquisite Bridal Makeup"
           className="w-full h-full object-cover brightness-[0.5] contrast-[1.1]"
           referrerPolicy="no-referrer"
         />
