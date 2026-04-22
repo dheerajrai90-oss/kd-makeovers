@@ -82,47 +82,48 @@ export default function Services() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="relative bg-gradient-to-br from-maroon via-maroon to-maroon/90 rounded-3xl p-8 md:p-12 mb-20 overflow-hidden shadow-[0_20px_50px_rgba(128,0,0,0.3)] group"
+          className="relative bg-maroon rounded-[2rem] p-8 md:p-16 mb-20 overflow-hidden shadow-2xl group border border-white/10"
         >
           {/* Animated Background Elements */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-gold/10 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-gold/20 transition-all duration-700" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -ml-20 -mb-20 blur-2xl" />
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gold/10 rounded-full -mr-64 -mt-64 blur-3xl group-hover:bg-gold/20 transition-all duration-1000" />
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-white/5 rounded-full -ml-32 -mb-32 blur-3xl opacity-50" />
           
           <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
             <div className="flex-1 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold/20 border border-gold/30 text-gold text-xs font-bold uppercase tracking-widest mb-6 animate-pulse">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-gold text-xs font-bold uppercase tracking-[0.2em] mb-8 shadow-sm">
                 <Sparkles className="w-3.5 h-3.5" />
                 Exclusive Member Benefit
               </div>
-              <h3 className="text-4xl md:text-5xl font-serif font-bold text-white mb-6 leading-tight">
+              <h3 className="text-4xl md:text-6xl font-serif font-bold text-white mb-8 leading-[1.1]">
                 Get rewarded for <br />
-                <span className="text-gold">every session</span>
+                <span className="text-gold italic">every session</span>
               </h3>
-              <p className="text-soft-pink/70 text-lg md:text-xl max-w-xl mx-auto lg:mx-0 font-light leading-relaxed">
-                Experience luxury and savings. Earn <span className="text-white font-medium">10 points for every ₹100 spent</span>. 
-                Redeem your beauty points for direct discounts on future bridal or party sessions!
+              <p className="text-soft-pink/80 text-lg md:text-xl max-w-xl mx-auto lg:mx-0 font-light leading-relaxed mb-10">
+                Experience luxury and savings. Earn <span className="text-white font-semibold">10 points for every ₹100 spent</span>. 
+                Redeem your points for direct discounts on your future bookings!
               </p>
+
+              <div className="flex flex-wrap justify-center lg:justify-start gap-4">
+                <Button size="lg" className="bg-gold hover:bg-white text-maroon hover:text-maroon font-bold text-lg h-16 px-10 rounded-xl shadow-lg transition-all" asChild>
+                  <a href="#appointment" className="flex items-center gap-3">
+                    Join & Book Now
+                    <Sparkles className="w-5 h-5 fill-current" />
+                  </a>
+                </Button>
+              </div>
             </div>
 
-            <div className="flex flex-col items-center lg:items-end gap-6">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gold blur-2xl opacity-20 animate-pulse" />
-                <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 flex items-center gap-6 shadow-2xl">
-                  <div className="w-16 h-16 rounded-xl bg-gold flex items-center justify-center shadow-lg transform -rotate-6 group-hover:rotate-0 transition-transform duration-500">
-                    <Coins className="w-10 h-10 text-maroon" />
+            <div className="flex flex-col items-center lg:items-end gap-8 min-w-[280px]">
+              <div className="relative w-full">
+                <div className="absolute inset-0 bg-gold blur-3xl opacity-20 animate-pulse" />
+                <div className="relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2rem] p-8 flex flex-col items-center text-center shadow-2xl">
+                  <div className="w-20 h-20 rounded-2xl bg-gold flex items-center justify-center shadow-xl mb-6 transform -rotate-12 group-hover:rotate-0 transition-transform duration-700">
+                    <Coins className="w-12 h-12 text-maroon" />
                   </div>
-                  <div>
-                    <div className="text-2xl font-serif font-bold text-white tracking-tight">1 Point = ₹1</div>
-                    <div className="text-soft-pink/60 text-sm">Instant Cashback equivalent</div>
-                  </div>
+                  <div className="text-3xl font-serif font-bold text-white mb-2 leading-none">1 Point = ₹1</div>
+                  <div className="text-gold/80 text-sm font-medium uppercase tracking-widest">Instant Cashback</div>
                 </div>
               </div>
-              <Button size="lg" className="bg-gold hover:bg-white text-maroon hover:text-maroon font-black text-lg h-16 px-10 rounded-full shadow-2xl transform hover:scale-105 active:scale-95 transition-all w-full md:w-auto" asChild>
-                <a href="#appointment" className="flex items-center gap-3">
-                  Join & Book Now
-                  <Sparkles className="w-5 h-5 fill-current" />
-                </a>
-              </Button>
             </div>
           </div>
         </motion.div>
@@ -181,18 +182,18 @@ export default function Services() {
         {/* Training Academy Section */}
         <div className="mt-32 pt-24 border-t border-maroon/10">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-maroon/10 text-maroon text-xs font-bold uppercase tracking-widest mb-4">
-              <Star className="w-3 h-3 fill-maroon" />
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-maroon/5 border border-maroon/10 text-maroon text-xs font-bold uppercase tracking-[0.2em] mb-4">
+              <Sparkles className="w-3.5 h-3.5 text-gold" />
               Professional Academy
             </div>
-            <h2 className="text-4xl md:text-5xl font-serif font-bold text-maroon mb-4">Academy & Courses</h2>
-            <div className="w-24 h-1 bg-gold mx-auto mb-6" />
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Build your career in the beauty industry with our certified professional training programs.
+            <h2 className="text-4xl md:text-6xl font-serif font-bold text-maroon mb-6">Academy & Courses</h2>
+            <div className="w-24 h-1.5 bg-gold mx-auto mb-8 rounded-full" />
+            <p className="text-gray-600 max-w-2xl mx-auto text-lg font-light leading-relaxed">
+              Build your career in the beauty industry with our certified professional training programs led by Komal Kumari.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto">
             {[
               { 
                 title: 'Professional Makeup Artist', 
@@ -227,32 +228,35 @@ export default function Services() {
             ].map((course, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-white rounded-3xl border border-maroon/5 shadow-lg hover:shadow-2xl transition-all group overflow-hidden flex flex-col"
+                className="w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] bg-white rounded-[2.5rem] border border-maroon/5 shadow-[0_15px_40px_rgba(128,0,0,0.06)] hover:shadow-[0_25px_60px_rgba(128,0,0,0.12)] transition-all group overflow-hidden flex flex-col"
               >
-                <div className="h-56 overflow-hidden relative">
+                <div className="h-64 overflow-hidden relative">
                   <img 
                     src={course.image} 
                     alt={course.title} 
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute inset-0 bg-maroon/20 group-hover:bg-transparent transition-colors duration-300" />
+                  <div className="absolute inset-0 bg-maroon/10 group-hover:bg-transparent transition-colors duration-500" />
                 </div>
-                <div className="p-8 flex flex-col flex-grow">
-                  <h4 className="text-xl font-bold text-maroon mb-2">{course.title}</h4>
-                  <div className="text-xs text-gold font-bold uppercase tracking-wider mb-4 border-b border-gold/20 pb-2 flex justify-between items-center">
-                    <span>Academy Course</span>
-                    <span>{course.duration}</span>
+                <div className="p-8 lg:p-10 flex flex-col flex-grow">
+                  <div className="flex items-center justify-between gap-4 mb-4">
+                    <h4 className="text-2xl font-serif font-bold text-maroon group-hover:text-gold transition-colors">{course.title}</h4>
                   </div>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-8 flex-grow">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-gold/10 text-gold text-[10px] font-black uppercase tracking-widest mb-6 w-fit">
+                    Course Duration: {course.duration}
+                  </div>
+                  <p className="text-gray-600 text-sm leading-relaxed mb-8 flex-grow font-light">
                     {course.desc}
                   </p>
-                  <Button variant="outline" className="w-full border-maroon/20 text-maroon hover:bg-maroon hover:text-white rounded-xl font-bold h-12" asChild>
-                    <a href="#appointment">Enquire Now</a>
+                  <Button variant="outline" className="w-full border-maroon/20 text-maroon hover:bg-maroon hover:text-white rounded-2xl font-bold h-14 text-base transition-all shadow-sm hover:shadow-md" asChild>
+                    <a href="#appointment" className="flex items-center justify-center gap-2">
+                      Request Course Details
+                    </a>
                   </Button>
                 </div>
               </motion.div>
