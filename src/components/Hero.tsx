@@ -4,19 +4,16 @@ import { Sparkles, MessageCircle } from 'lucide-react';
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-24 sm:pt-32 overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center pt-24 sm:pt-32 overflow-hidden bg-maroon">
       {/* Background Image with Overlay */}
-      <div className="absolute inset-0 z-0 pointer-events-none bg-maroon">
-        <motion.img
-          initial={{ scale: 1.1, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1.5 }}
-          src="https://images.pexels.com/photos/10351239/pexels-photo-10351239.jpeg?auto=compress&cs=tinysrgb&w=1920"
-          alt="Exquisite Bridal Makeup"
+      <div className="absolute inset-0 z-0">
+        <img
+          src="https://images.pexels.com/photos/22605372/pexels-photo-22605372.jpeg?auto=compress&cs=tinysrgb&w=1920"
+          alt="Premium Makeup Artistry"
           className="w-full h-full object-cover brightness-[0.5] contrast-[1.1]"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-maroon/20 to-black/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80" />
       </div>
 
       <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left">
@@ -26,7 +23,7 @@ export default function Hero() {
           transition={{ duration: 0.8 }}
           className="max-w-2xl"
         >
-          <div className="flex flex-wrap gap-4 mb-6">
+          <div className="flex flex-wrap justify-center sm:justify-start gap-4 mb-6">
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-gold/20 border border-gold/30 text-gold text-sm font-medium">
               <Sparkles className="w-4 h-4" />
               <span>Delhi's Premium Bridal Studio</span>
@@ -39,7 +36,7 @@ export default function Hero() {
             >
               <img src="https://www.google.com/favicon.ico" alt="Google" className="w-3.5 h-3.5" />
               <span className="flex items-center gap-1">
-                4.9 <span className="text-gold">★★★★★</span> (200+ Reviews)
+                4.9 <span className="text-gold">★★★★★</span> (200+)
               </span>
             </a>
           </div>
@@ -50,7 +47,7 @@ export default function Hero() {
             Exquisite Indian bridal makeovers and premium cosmetics by Komal Kumari. 
             Crafting timeless looks for your most special moments.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row justify-center sm:justify-start gap-4">
             <Button size="lg" className="bg-gold hover:bg-gold/90 text-maroon font-bold text-lg h-14 px-8" asChild>
               <a href="#appointment">Book Appointment</a>
             </Button>

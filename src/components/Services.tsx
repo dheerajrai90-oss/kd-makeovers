@@ -197,32 +197,32 @@ export default function Services() {
               { 
                 title: 'Professional Makeup Artist', 
                 desc: 'Become a certified MUA with hands-on training in HD, Airbrush, and Bridal makeup.',
-                icon: <Sparkles className="w-8 h-8 text-gold" />,
-                duration: '45 Days'
+                duration: '45 Days',
+                image: 'https://images.pexels.com/photos/4006709/pexels-photo-4006709.jpeg?auto=compress&cs=tinysrgb&w=800'
               },
               { 
                 title: 'Hair Styling Masterclass', 
                 desc: 'Master the art of traditional and modern hair styling for every occasion.',
-                icon: <Scissors className="w-8 h-8 text-gold" />,
-                duration: '30 Days'
+                duration: '30 Days',
+                image: 'https://images.pexels.com/photos/3065209/pexels-photo-3065209.jpeg?auto=compress&cs=tinysrgb&w=800'
               },
               { 
                 title: 'Professional Nail Art', 
                 desc: 'Learn nail extensions, gel polish, and creative nail art techniques from scratch.',
-                icon: <Star className="w-8 h-8 text-gold" />,
-                duration: '15 Days'
+                duration: '15 Days',
+                image: 'https://images.pexels.com/photos/18112333/pexels-photo-18112333.jpeg?auto=compress&cs=tinysrgb&w=800'
               },
               { 
                 title: 'Professional Beautician', 
                 desc: 'Comprehensive course covering skin analysis, facials, and advanced beauty treatments.',
-                icon: <Heart className="w-8 h-8 text-gold" />,
-                duration: '60 Days'
+                duration: '60 Days',
+                image: 'https://images.pexels.com/photos/6663373/pexels-photo-6663373.jpeg?auto=compress&cs=tinysrgb&w=800'
               },
               { 
                 title: 'Custom Skill Training', 
                 desc: 'Specific modules tailored for your needs—perfect for quick skill upgrading.',
-                icon: <Star className="w-8 h-8 text-gold" />,
-                duration: 'Custom'
+                duration: 'Custom',
+                image: 'https://images.pexels.com/photos/5069432/pexels-photo-5069432.jpeg?auto=compress&cs=tinysrgb&w=800'
               }
             ].map((course, i) => (
               <motion.div
@@ -231,21 +231,30 @@ export default function Services() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-white p-8 rounded-3xl border border-maroon/5 shadow-lg hover:shadow-2xl transition-all group"
+                className="bg-white rounded-3xl border border-maroon/5 shadow-lg hover:shadow-2xl transition-all group overflow-hidden flex flex-col"
               >
-                <div className="w-16 h-16 rounded-2xl bg-maroon flex items-center justify-center mb-6 group-hover:rotate-6 transition-transform">
-                  {course.icon}
+                <div className="h-56 overflow-hidden relative">
+                  <img 
+                    src={course.image} 
+                    alt={course.title} 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 bg-maroon/20 group-hover:bg-transparent transition-colors duration-300" />
                 </div>
-                <h4 className="text-xl font-bold text-maroon mb-2">{course.title}</h4>
-                <div className="text-xs text-gold font-bold uppercase tracking-wider mb-4 border-b border-gold/20 pb-2">
-                  Duration: {course.duration}
+                <div className="p-8 flex flex-col flex-grow">
+                  <h4 className="text-xl font-bold text-maroon mb-2">{course.title}</h4>
+                  <div className="text-xs text-gold font-bold uppercase tracking-wider mb-4 border-b border-gold/20 pb-2 flex justify-between items-center">
+                    <span>Academy Course</span>
+                    <span>{course.duration}</span>
+                  </div>
+                  <p className="text-gray-600 text-sm leading-relaxed mb-8 flex-grow">
+                    {course.desc}
+                  </p>
+                  <Button variant="outline" className="w-full border-maroon/20 text-maroon hover:bg-maroon hover:text-white rounded-xl font-bold h-12" asChild>
+                    <a href="#appointment">Enquire Now</a>
+                  </Button>
                 </div>
-                <p className="text-gray-600 text-sm leading-relaxed mb-6">
-                  {course.desc}
-                </p>
-                <Button variant="outline" className="w-full border-maroon/20 text-maroon hover:bg-maroon hover:text-white rounded-full font-bold" asChild>
-                  <a href="#appointment">Enquire Now</a>
-                </Button>
               </motion.div>
             ))}
           </div>
