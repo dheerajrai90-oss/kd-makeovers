@@ -193,7 +193,7 @@ export default function Services() {
             </p>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {[
               { 
                 title: 'Professional Makeup Artist', 
@@ -232,9 +232,13 @@ export default function Services() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] bg-white rounded-[2.5rem] border border-maroon/5 shadow-[0_15px_40px_rgba(128,0,0,0.06)] hover:shadow-[0_25px_60px_rgba(128,0,0,0.12)] transition-all group overflow-hidden flex flex-col"
+                className={`bg-white rounded-3xl border border-maroon/5 shadow-[0_15px_40px_rgba(128,0,0,0.06)] hover:shadow-[0_25px_60px_rgba(128,0,0,0.12)] transition-all group overflow-hidden flex flex-col ${
+                  i === 3 ? 'md:col-start-1 lg:col-start-automatic' : ''
+                } ${
+                  i === 4 ? 'lg:col-start-automatic' : ''
+                }`}
               >
-                <div className="h-64 overflow-hidden relative">
+                <div className="h-56 sm:h-64 overflow-hidden relative">
                   <img 
                     src={course.image} 
                     alt={course.title} 
@@ -243,18 +247,16 @@ export default function Services() {
                   />
                   <div className="absolute inset-0 bg-maroon/10 group-hover:bg-transparent transition-colors duration-500" />
                 </div>
-                <div className="p-8 lg:p-10 flex flex-col flex-grow">
-                  <div className="flex items-center justify-between gap-4 mb-4">
-                    <h4 className="text-2xl font-serif font-bold text-maroon group-hover:text-gold transition-colors">{course.title}</h4>
-                  </div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-gold/10 text-gold text-[10px] font-black uppercase tracking-widest mb-6 w-fit">
+                <div className="p-6 sm:p-8 lg:p-10 flex flex-col flex-grow">
+                  <h4 className="text-xl sm:text-2xl font-serif font-bold text-maroon mb-3 group-hover:text-gold transition-colors">{course.title}</h4>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-gold/10 text-gold text-[10px] font-black uppercase tracking-widest mb-4 w-fit">
                     Course Duration: {course.duration}
                   </div>
                   <p className="text-gray-600 text-sm leading-relaxed mb-8 flex-grow font-light">
                     {course.desc}
                   </p>
-                  <Button variant="outline" className="w-full border-maroon/20 text-maroon hover:bg-maroon hover:text-white rounded-2xl font-bold h-14 text-base transition-all shadow-sm hover:shadow-md" asChild>
-                    <a href="#appointment" className="flex items-center justify-center gap-2">
+                  <Button variant="outline" className="w-full border-maroon/20 text-maroon hover:bg-maroon hover:text-white rounded-2xl font-bold h-12 sm:h-14 text-base transition-all shadow-sm hover:shadow-md" asChild>
+                    <a href="https://api.whatsapp.com/send?phone=919650349357&text=Hi%20Komal,%20I'm%20interested%20in%20your%20academy%20courses!" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
                       Request Course Details
                     </a>
                   </Button>
