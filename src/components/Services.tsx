@@ -13,7 +13,7 @@ const DEFAULT_SERVICES: Service[] = [
     description: 'Complete bridal transformation including hair styling, draping, and premium HD makeup.',
     price: '₹10,000 onwards',
     category: 'Bridal',
-    imageUrl: 'https://images.pexels.com/photos/30452324/pexels-photo-30452324.jpeg?auto=compress&cs=tinysrgb&w=800'
+    imageUrl: 'https://images.pexels.com/photos/11111797/pexels-photo-11111797.jpeg?auto=compress&cs=tinysrgb&w=800'
   },
   {
     name: 'Party Makeup',
