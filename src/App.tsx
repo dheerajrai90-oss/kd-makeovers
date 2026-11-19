@@ -1,84 +1,185 @@
-import { useState, useEffect } from 'react';
-import { auth, db } from '@/src/firebase';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import { Button } from '@/components/ui/button';
-import Services from './components/Services';
-import Offers from './components/Offers';
-import Gallery from './components/Gallery';
-import Reviews from './components/Reviews';
-import AppointmentForm from './components/AppointmentForm';
-import UserAppointments from './components/UserAppointments';
-import AdminPanel from './components/AdminPanel';
-import Location from './components/Location';
-import Footer from './components/Footer';
-import { Toaster } from '@/components/ui/sonner';
+import { useEffect, type ReactNode } from 'react';
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Toaster } from 'sonner';
+import { SalonProvider, useSalon } from '@/src/context/SalonContext';
+import { ErrorBoundary } from '@/src/components/ErrorBoundary';
+import { KDLogo } from '@/src/components/KDLogo';
+import { OfflineIndicator } from '@/src/components/OfflineIndicator';
+import Navbar from '@/src/components/Navbar';
+import Footer from '@/src/components/Footer';
+import Hero from '@/src/components/Hero';
+import PackagesSection from '@/src/components/PackagesSection';
+import ServicesSection from '@/src/components/ServicesSection';
+import GallerySection from '@/src/components/GallerySection';
+import OffersSection from '@/src/components/OffersSection';
+import ReviewsSection from '@/src/components/ReviewsSection';
+import LocationSection from '@/src/components/LocationSection';
+import BookingSection from '@/src/components/BookingSection';
+import CustomerDashboard from '@/src/components/CustomerDashboard';
+import AdminLayout from '@/src/components/admin/AdminLayout';
 
-export default function App() {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthReady, setIsAuthReady] = useState(false);
+const ROUTE_TITLES: Record<string, string> = {
+  '/': 'KD Makeovers & Cosmetics | Luxury Bridal Makeup & Salon in Delhi',
+  '/services': 'Services Catalogue & Academy | KD Makeovers & Cosmetics',
+  '/packages': 'Bridal & Event Packages | KD Makeovers & Cosmetics',
+  '/gallery': 'Makeup & Styling Gallery | KD Makeovers & Cosmetics',
+  '/offers': 'Offers & Promotions | KD Makeovers & Cosmetics',
+  '/book': 'Book Appointment Online | KD Makeovers & Cosmetics',
+  '/my-bookings': 'My Bookings & Account | KD Makeovers & Cosmetics',
+  '/contact': 'Location & Contact | KD Makeovers & Cosmetics',
+  '/admin': 'Studio Administration | KD Makeovers & Cosmetics',
+};
+
+function RouteManager() {
+  const { pathname } = useLocation();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (u) => {
-      setUser(u);
-      if (u) {
-        try {
-          // Sync user profile
-          const userRef = doc(db, 'userProfiles', u.uid);
-          const userSnap = await getDoc(userRef);
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+    document.title = ROUTE_TITLES[pathname] || ROUTE_TITLES['/'];
+  }, [pathname]);
 
-          if (!userSnap.exists()) {
-            await setDoc(userRef, {
-              uid: u.uid,
-              email: u.email,
-              displayName: u.displayName || 'Customer',
-              loyaltyPoints: 0,
-              totalSpent: 0,
-              updatedAt: serverTimestamp()
-            });
-          }
-        } catch (error) {
-          console.error("Failed to sync user profile with Firestore:", error);
-          // Don't block auth readiness if Firestore is unavailable
-        }
-      }
-      setIsAuthReady(true);
-    });
-    return () => unsubscribe();
-  }, []);
+  return null;
+}
 
-  const isAdmin = user?.email === 'komalbsc@gmail.com' || user?.email === 'dheeraj.rai90@gmail.com';
+function HomePage() {
+  return (
+    <>
+      <Hero />
+      <PackagesSection compactHomeMode />
+      <ServicesSection compactHomeMode />
+      <GallerySection compactHomeMode />
+      <OffersSection compactHomeMode />
+      <ReviewsSection />
+      <LocationSection />
+    </>
+  );
+}
+
+function CustomerShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="min-h-screen flex flex-col bg-kd-black text-white">
+      <Navbar />
+      <main className="flex-grow pb-16 md:pb-0">{children}</main>
+      <Footer />
+      <OfflineIndicator />
+    </div>
+  );
+}
+
+function AppRoutes() {
+  const { isAuthReady, settings } = useSalon();
 
   if (!isAuthReady) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-soft-pink">
-        <div className="animate-pulse flex flex-col items-center">
-          <div className="text-4xl font-serif font-bold text-maroon mb-2">KD Makeovers</div>
-          <div className="text-[10px] uppercase tracking-[0.3em] text-maroon/60 font-medium mb-6">Redefine Beauty</div>
-          <div className="w-16 h-1 bg-gold rounded-full"></div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-kd-black text-white p-6">
+        <div className="animate-pulse flex flex-col items-center gap-5">
+          <KDLogo
+            logoUrl={settings.logoUrl}
+            businessName={settings.businessName}
+            tagline={settings.tagline}
+            size="lg"
+            showTagline
+          />
+          <div className="w-24 h-0.5 rounded-full bg-gradient-to-r from-transparent via-kd-rosegold to-transparent" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <main className="flex-grow">
-        <Hero />
-        <Services />
-        <Offers />
-        <Gallery />
-        <Reviews />
-        <AppointmentForm />
-        {user && !isAdmin && <UserAppointments />}
-        {isAdmin && <AdminPanel />}
-        <Location />
-      </main>
-      <Footer />
-      <Toaster position="top-center" expand={true} richColors />
-    </div>
+    <>
+      <RouteManager />
+      <Routes>
+        <Route path="/admin" element={<AdminLayout />} />
+        <Route
+          path="/"
+          element={
+            <CustomerShell>
+              <HomePage />
+            </CustomerShell>
+          }
+        />
+        <Route
+          path="/services"
+          element={
+            <CustomerShell>
+              <ServicesSection />
+            </CustomerShell>
+          }
+        />
+        <Route
+          path="/packages"
+          element={
+            <CustomerShell>
+              <PackagesSection />
+            </CustomerShell>
+          }
+        />
+        <Route
+          path="/gallery"
+          element={
+            <CustomerShell>
+              <GallerySection />
+            </CustomerShell>
+          }
+        />
+        <Route
+          path="/offers"
+          element={
+            <CustomerShell>
+              <OffersSection />
+            </CustomerShell>
+          }
+        />
+        <Route
+          path="/book"
+          element={
+            <CustomerShell>
+              <BookingSection />
+            </CustomerShell>
+          }
+        />
+        <Route
+          path="/my-bookings"
+          element={
+            <CustomerShell>
+              <CustomerDashboard />
+            </CustomerShell>
+          }
+        />
+        <Route
+          path="/contact"
+          element={
+            <CustomerShell>
+              <LocationSection />
+            </CustomerShell>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <Toaster
+        position="top-center"
+        richColors
+        toastOptions={{
+          style: {
+            background: '#171415',
+            color: '#FFFFFF',
+            border: '1px solid rgba(239, 208, 208, 0.35)',
+          },
+        }}
+      />
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <ErrorBoundary>
+      <SalonProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </SalonProvider>
+    </ErrorBoundary>
   );
 }

@@ -1,13 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-maroon: #800000;
-  --color-gold: #D4AF37;
-  --color-soft-pink: #FDF2F2;
-  --font-serif: "Playfair Display", serif;
-  --font-sans: "Inter", sans-serif;
-  
+  --color-kd-black: #0D0D0D;
+  --color-kd-surface: #171415;
+  --color-kd-pink: #EFD0D0;
+  --color-kd-blush: #F7E8E8;
+  --color-kd-rosegold: #B88970;
+  --color-kd-muted: #C9BDBD;
+  --color-maroon: #171415;
+  --color-gold: #B88970;
+  --color-soft-pink: #F7E8E8;
+
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -31,37 +38,52 @@
 
 @layer base {
   :root {
-    --background: #FDF2F2;
-    --foreground: #1a1a1a;
-    --card: #ffffff;
-    --card-foreground: #1a1a1a;
-    --popover: #ffffff;
-    --popover-foreground: #1a1a1a;
-    --primary: #800000;
-    --primary-foreground: #ffffff;
-    --secondary: #D4AF37;
-    --secondary-foreground: #ffffff;
-    --muted: #f3f4f6;
-    --muted-foreground: #6b7280;
-    --accent: #D4AF37;
-    --accent-foreground: #ffffff;
+    --background: #0D0D0D;
+    --foreground: #FFFFFF;
+    --card: #171415;
+    --card-foreground: #FFFFFF;
+    --popover: #171415;
+    --popover-foreground: #FFFFFF;
+    --primary: #EFD0D0;
+    --primary-foreground: #0D0D0D;
+    --secondary: #B88970;
+    --secondary-foreground: #FFFFFF;
+    --muted: #221D1E;
+    --muted-foreground: #C9BDBD;
+    --accent: #B88970;
+    --accent-foreground: #FFFFFF;
     --destructive: #ef4444;
-    --destructive-foreground: #ffffff;
-    --border: #e5e7eb;
-    --input: #e5e7eb;
-    --ring: #800000;
-    --radius: 0.5rem;
+    --destructive-foreground: #FFFFFF;
+    --border: rgba(239, 208, 208, 0.22);
+    --input: rgba(184, 137, 112, 0.32);
+    --ring: #EFD0D0;
+    --radius: 0.75rem;
   }
 
   html {
     scroll-behavior: smooth;
+    background-color: #0D0D0D;
+    color: #FFFFFF;
   }
 
   body {
-    @apply font-sans bg-background text-foreground antialiased;
+    @apply font-sans bg-kd-black text-white antialiased selection:bg-kd-pink selection:text-kd-black;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif font-bold;
+    @apply font-serif tracking-tight;
+    text-wrap: balance;
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

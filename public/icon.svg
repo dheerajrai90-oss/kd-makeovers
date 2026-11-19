@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="roseGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F0CECF"/>
+      <stop offset="50%" stop-color="#B88970"/>
+      <stop offset="100%" stop-color="#E5B9A8"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A1718"/>
+      <stop offset="100%" stop-color="#101010"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#bgGrad)"/>
+  <rect x="28" y="28" width="456" height="456" rx="76" fill="none" stroke="url(#roseGoldGrad)" stroke-width="4" opacity="0.7"/>
+  <rect x="44" y="44" width="424" height="424" rx="64" fill="none" stroke="#F0CECF" stroke-width="1.5" opacity="0.25"/>
+  <text x="256" y="292" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="184" letter-spacing="-8" fill="url(#roseGoldGrad)">KD</text>
+  <line x1="136" y1="336" x2="376" y2="336" stroke="#B88970" stroke-width="2" opacity="0.6"/>
+  <text x="256" y="378" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="600" font-size="24" letter-spacing="9" fill="#F0CECF">MAKEOVERS</text>
+</svg>

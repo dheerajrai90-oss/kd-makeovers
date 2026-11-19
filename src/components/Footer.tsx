@@ -1,114 +1,144 @@
-import { Instagram, Facebook, MessageCircle, MapPin, Phone, Mail } from 'lucide-react';
-import { motion } from 'motion/react';
+import { Link } from 'react-router-dom';
+import { Instagram, Facebook, MessageCircle, MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { useSalon } from '@/src/context/SalonContext';
+import { VERIFIED_BUSINESS_INFO } from '@/src/data/defaults';
+import { buildWhatsAppUrl } from '@/src/lib/bookingUtils';
+import { KDLogo } from './KDLogo';
+import { PWAInstallButton } from './PWAInstallButton';
 
 export default function Footer() {
+  const { settings } = useSalon();
+  const whatsappHref = buildWhatsAppUrl(
+    settings.whatsappNumber || VERIFIED_BUSINESS_INFO.whatsappNumber,
+    'Hello Komal, I would like to enquire about makeup and salon services at KD Makeovers.'
+  );
+
   return (
-    <footer className="bg-maroon text-white pt-20 pb-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-          <div className="md:col-span-2 flex flex-col items-center md:items-start text-center md:text-left">
-            <div className="flex flex-col md:flex-row items-center gap-5 mb-8 group w-full justify-center md:justify-start">
-              <div className="flex flex-col items-center md:items-start">
-                <h2 className="text-3xl font-serif font-bold text-gold tracking-tight">KD Makeovers & Cosmetics</h2>
-                <div className="w-12 h-0.5 bg-gold/30 mt-1" />
+    <>
+      <footer className="bg-kd-surface border-t border-kd-rosegold/25 text-white pt-16 pb-24 md:pb-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-kd-rosegold/20">
+            {/* Brand & App Install */}
+            <div className="lg:col-span-2 space-y-5">
+              <KDLogo
+                logoUrl={settings.logoUrl}
+                businessName={settings.businessName}
+                tagline={settings.tagline}
+                size="md"
+                showTagline={true}
+              />
+              <p className="text-sm text-kd-muted max-w-md leading-relaxed">
+                Bridal makeup studio, luxury salon care, and curated cosmetics led by Komal Kumari in Sant Nagar, Delhi. Crafting radiant, camera-ready looks for weddings and everyday confidence.
+              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <PWAInstallButton variant="footer" />
+                <a
+                  href={settings.instagramUrl || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="w-10 h-10 rounded-xl border border-kd-rosegold/30 bg-kd-black flex items-center justify-center text-kd-pink hover:bg-kd-pink hover:text-kd-black transition-colors"
+                >
+                  <Instagram className="w-4 h-4" />
+                </a>
+                <a
+                  href={settings.facebookUrl || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="w-10 h-10 rounded-xl border border-kd-rosegold/30 bg-kd-black flex items-center justify-center text-kd-pink hover:bg-kd-pink hover:text-kd-black transition-colors"
+                >
+                  <Facebook className="w-4 h-4" />
+                </a>
+                <a
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="WhatsApp"
+                  className="w-10 h-10 rounded-xl border border-kd-rosegold/30 bg-kd-black flex items-center justify-center text-kd-pink hover:bg-kd-pink hover:text-kd-black transition-colors"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                </a>
               </div>
             </div>
-            <p className="text-soft-pink/70 max-w-md mb-8 leading-relaxed text-center md:text-left mx-auto md:mx-0">
-              Premium Indian bridal makeup and cosmetics services in Delhi. 
-              We believe every bride deserves to look her best on her special day. 
-              Our expert team led by Komal Kumari is dedicated to making your beauty dreams come true.
-            </p>
-            <div className="flex space-x-4">
-              <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-gold hover:text-maroon transition-all">
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-gold hover:text-maroon transition-all">
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a 
-                href="https://api.whatsapp.com/send?phone=919650349357&text=Hello%20Komal!" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-gold hover:text-maroon transition-all"
-              >
-                <MessageCircle className="w-5 h-5" />
-              </a>
+
+            {/* Explore Links */}
+            <div>
+              <h3 className="font-serif text-xl font-semibold text-kd-pink mb-4">Explore</h3>
+              <ul className="space-y-2.5 text-sm text-kd-muted">
+                <li><Link to="/" className="hover:text-white transition-colors">Home</Link></li>
+                <li><Link to="/services" className="hover:text-white transition-colors">Services Catalogue</Link></li>
+                <li><Link to="/packages" className="hover:text-white transition-colors">Bridal Packages</Link></li>
+                <li><Link to="/gallery" className="hover:text-white transition-colors">Makeup Gallery</Link></li>
+                <li><Link to="/offers" className="hover:text-white transition-colors">Offers & Deals</Link></li>
+                <li><Link to="/book" className="hover:text-white transition-colors">Book Appointment</Link></li>
+                <li><Link to="/my-bookings" className="hover:text-white transition-colors">My Bookings</Link></li>
+              </ul>
+            </div>
+
+            {/* Verified Contact */}
+            <div>
+              <h3 className="font-serif text-xl font-semibold text-kd-pink mb-4">Visit Studio</h3>
+              <ul className="space-y-3 text-sm text-kd-muted">
+                <li className="flex items-start gap-2.5">
+                  <MapPin className="w-4 h-4 text-kd-rosegold shrink-0 mt-1" />
+                  <a
+                    href={VERIFIED_BUSINESS_INFO.mapDirectionsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white transition-colors leading-relaxed"
+                  >
+                    {settings.address || VERIFIED_BUSINESS_INFO.fullAddress}
+                  </a>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Phone className="w-4 h-4 text-kd-rosegold shrink-0" />
+                  <a href={`tel:${settings.phone || VERIFIED_BUSINESS_INFO.phoneRaw}`} className="hover:text-white transition-colors tabular-nums">
+                    {settings.phone || VERIFIED_BUSINESS_INFO.phoneDisplay}
+                  </a>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Mail className="w-4 h-4 text-kd-rosegold shrink-0" />
+                  <a href={`mailto:${settings.email || VERIFIED_BUSINESS_INFO.email}`} className="hover:text-white transition-colors">
+                    {settings.email || VERIFIED_BUSINESS_INFO.email}
+                  </a>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Clock className="w-4 h-4 text-kd-rosegold shrink-0" />
+                  <span>{VERIFIED_BUSINESS_INFO.hoursSummary}</span>
+                </li>
+              </ul>
             </div>
           </div>
 
-          <div>
-            <h3 className="text-xl font-serif font-bold text-gold mb-6">Quick Links</h3>
-            <ul className="space-y-4 text-soft-pink/70">
-              <li><a href="#" className="hover:text-gold transition-colors">Home</a></li>
-              <li><a href="#services" className="hover:text-gold transition-colors">Services</a></li>
-              <li><a href="#gallery" className="hover:text-gold transition-colors">Gallery</a></li>
-              <li><a href="#reviews" className="hover:text-gold transition-colors">Reviews</a></li>
-              <li><a href="#appointment" className="hover:text-gold transition-colors">Book Now</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-xl font-serif font-bold text-gold mb-6">Contact Us</h3>
-            <ul className="space-y-4 text-soft-pink/70">
-              <li className="flex items-start space-x-3">
-                <MapPin className="w-5 h-5 text-gold flex-shrink-0 mt-1" />
-                <a 
-                  href="https://share.google/xIt4UThOQCeSDPB8I" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="hover:text-gold transition-colors"
-                >
-                  41ft Road Kamal Vihar, Sant Nagar, Delhi-110084
-                </a>
-              </li>
-              <li className="flex items-center space-x-3">
-                <Phone className="w-5 h-5 text-gold flex-shrink-0" />
-                <a href="tel:+919650349357" className="hover:text-gold transition-colors">+91 96503 49357</a>
-              </li>
-              <li className="flex items-center space-x-3">
-                <Mail className="w-5 h-5 text-gold flex-shrink-0" />
-                <a href="mailto:komalbsc@gmail.com" className="hover:text-gold transition-colors">komalbsc@gmail.com</a>
-              </li>
-            </ul>
+          <div className="pt-8 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-kd-muted">
+            <p>© {new Date().getFullYear()} {settings.businessName || VERIFIED_BUSINESS_INFO.name}. All rights reserved.</p>
+            <p>Sant Nagar, Burari, Delhi-110084 · Lead Artist: Komal Kumari</p>
           </div>
         </div>
+      </footer>
 
-        <div className="border-t border-white/10 pt-8 flex flex-col md:row justify-between items-center text-soft-pink/50 text-sm">
-          <p>© {new Date().getFullYear()} KD Makeovers & Cosmetics. All rights reserved.</p>
-          <p className="mt-2 md:mt-0">Designed with ❤️ for Komal Kumari</p>
-        </div>
+      {/* Floating WhatsApp & Phone Call Actions */}
+      <div className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-[85] flex flex-col gap-2.5">
+        <a
+          href={`tel:${settings.phone || VERIFIED_BUSINESS_INFO.phoneRaw}`}
+          aria-label="Call KD Makeovers"
+          className="w-12 h-12 rounded-full bg-kd-surface border border-kd-rosegold/60 text-kd-pink hover:bg-kd-pink hover:text-kd-black shadow-xl flex items-center justify-center transition-colors"
+          title="Call Studio"
+        >
+          <Phone className="w-5 h-5" />
+        </a>
+        <a
+          href={whatsappHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Chat on WhatsApp"
+          className="w-12 h-12 rounded-full bg-[#25D366] text-white hover:bg-[#20bd5a] shadow-xl flex items-center justify-center transition-colors ring-2 ring-kd-black"
+          title="Chat on WhatsApp"
+        >
+          <MessageCircle className="w-5 h-5 fill-current" />
+        </a>
       </div>
-
-      {/* WhatsApp Floating Button */}
-      <motion.a
-        href="https://api.whatsapp.com/send?phone=919650349357&text=Hi%20Komal,%20I'd%20like%20to%20book%20a%20makeup%20session."
-        target="_blank"
-        rel="noopener noreferrer"
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 right-6 z-[9999] flex items-center group cursor-pointer"
-      >
-        <motion.div
-          animate={{ 
-            scale: [1, 1.4, 1],
-            opacity: [0.6, 0, 0.6]
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="absolute inset-0 bg-green-500 rounded-full pointer-events-none"
-        />
-        <div className="relative bg-green-500 text-white p-4 rounded-full shadow-2xl flex items-center gap-2 overflow-hidden ring-4 ring-white/20">
-          <MessageCircle className="w-6 h-6 fill-current" />
-          <span className="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-500 font-bold group-hover:ml-1">
-            Chat with us
-          </span>
-        </div>
-      </motion.a>
-    </footer>
+    </>
   );
 }

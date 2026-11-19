@@ -1,92 +1,278 @@
 {
   "entities": {
-    "Appointment": {
-      "title": "Appointment",
-      "description": "A booking request for a beauty service.",
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Customer account, contact details, loyalty points, and favorites.",
       "type": "object",
       "properties": {
-        "name": { "type": "string", "description": "Customer name" },
-        "phone": { "type": "string", "description": "Customer phone number" },
-        "service": { "type": "string", "description": "Requested service" },
-        "date": { "type": "string", "description": "Appointment date (YYYY-MM-DD)" },
-        "time": { "type": "string", "description": "Appointment time (HH:mm)" },
-        "status": { "type": "string", "enum": ["pending", "confirmed", "rejected", "completed"], "description": "Current status of the appointment" },
-        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when the appointment was created" }
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 200 },
+        "displayName": { "type": "string", "maxLength": 120 },
+        "phone": { "type": "string", "maxLength": 24 },
+        "address": { "type": "string", "maxLength": 300 },
+        "loyaltyPoints": { "type": "number" },
+        "totalSpent": { "type": "number" },
+        "totalVisits": { "type": "number" },
+        "notes": { "type": "string", "maxLength": 1000 },
+        "favoriteServiceIds": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["name", "phone", "service", "date", "time", "status", "createdAt"]
+      "required": ["uid", "email", "displayName", "loyaltyPoints", "totalSpent", "totalVisits", "updatedAt"]
     },
     "Service": {
       "title": "Service",
-      "description": "A beauty service offered by the parlour.",
+      "description": "Salon beauty or makeup service.",
       "type": "object",
       "properties": {
-        "name": { "type": "string", "description": "Service name" },
-        "description": { "type": "string", "description": "Service description" },
-        "price": { "type": "string", "description": "Service price" },
-        "category": { "type": "string", "description": "Service category (e.g., Bridal, Makeup, Hair)" }
+        "name": { "type": "string", "maxLength": 120 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "price": { "type": "string", "maxLength": 60 },
+        "numericPrice": { "type": "number" },
+        "durationMinutes": { "type": "number" },
+        "category": { "type": "string", "maxLength": 80 },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "active": { "type": "boolean" },
+        "featured": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["name", "description", "price", "category"]
+      "required": ["name", "description", "price", "category", "durationMinutes", "active"]
     },
-    "Review": {
-      "title": "Review",
-      "description": "Customer feedback and rating.",
+    "ServiceCategory": {
+      "title": "Service Category",
+      "description": "Organized salon service category.",
       "type": "object",
       "properties": {
-        "name": { "type": "string", "description": "Customer name" },
-        "rating": { "type": "number", "description": "Rating from 1 to 5" },
-        "comment": { "type": "string", "description": "Review text" },
-        "approved": { "type": "boolean", "description": "Whether the review is approved for display" },
-        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when the review was created" }
+        "name": { "type": "string", "maxLength": 80 },
+        "slug": { "type": "string", "maxLength": 80 },
+        "displayOrder": { "type": "number" },
+        "active": { "type": "boolean" }
       },
-      "required": ["name", "rating", "comment", "approved", "createdAt"]
+      "required": ["name", "slug", "displayOrder", "active"]
+    },
+    "Package": {
+      "title": "Bridal Package",
+      "description": "Curated bridal, engagement, pre-bridal, guest, or custom package.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 140 },
+        "tier": { "type": "string", "enum": ["Bridal", "Engagement", "Pre-Bridal", "Wedding Guest", "Custom"] },
+        "price": { "type": "string", "maxLength": 60 },
+        "numericPrice": { "type": "number" },
+        "includedServices": { "type": "array" },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "description": { "type": "string", "maxLength": 1200 },
+        "specialOffer": { "type": "string", "maxLength": 200 },
+        "durationMinutes": { "type": "number" },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "tier", "price", "includedServices", "description", "active", "createdAt"]
+    },
+    "Appointment": {
+      "title": "Appointment",
+      "description": "Customer appointment booking.",
+      "type": "object",
+      "properties": {
+        "bookingCode": { "type": "string", "maxLength": 32 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 120 },
+        "phone": { "type": "string", "maxLength": 24 },
+        "email": { "type": "string", "maxLength": 200 },
+        "bookingType": { "type": "string", "enum": ["service", "package", "course"] },
+        "service": { "type": "string", "maxLength": 160 },
+        "serviceId": { "type": "string", "maxLength": 128 },
+        "packageId": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "time": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" },
+        "durationMinutes": { "type": "number" },
+        "slotKeys": { "type": "array" },
+        "notes": { "type": "string", "maxLength": 1000 },
+        "referenceImages": { "type": "array" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "rescheduled", "completed", "cancelled", "no_show"] },
+        "price": { "type": "number" },
+        "advancePaid": { "type": "number" },
+        "paymentStatus": { "type": "string", "enum": ["unpaid", "partial", "paid", "refunded"] },
+        "pointsUsed": { "type": "number" },
+        "pointsEarned": { "type": "number" },
+        "internalNotes": { "type": "string", "maxLength": 1000 },
+        "rescheduleRequested": { "type": "boolean" },
+        "requestedDate": { "type": "string", "maxLength": 20 },
+        "requestedTime": { "type": "string", "maxLength": 20 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["bookingCode", "name", "phone", "bookingType", "service", "date", "time", "durationMinutes", "status", "price", "advancePaid", "paymentStatus", "pointsUsed", "pointsEarned", "createdAt", "updatedAt"]
+    },
+    "BookedSlot": {
+      "title": "Booked Slot",
+      "description": "Non-PII appointment time slot lock to prevent double bookings.",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "time": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" },
+        "appointmentId": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "enum": ["active", "released"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["date", "time", "appointmentId", "status", "createdAt"]
+    },
+    "BookingTracker": {
+      "title": "Booking Tracker",
+      "description": "Privacy-preserving status tracker keyed by hash(bookingCode + phone).",
+      "type": "object",
+      "properties": {
+        "bookingCode": { "type": "string", "maxLength": 32 },
+        "appointmentId": { "type": "string", "maxLength": 128 },
+        "service": { "type": "string", "maxLength": 160 },
+        "date": { "type": "string", "maxLength": 20 },
+        "time": { "type": "string", "maxLength": 20 },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "rescheduled", "completed", "cancelled", "no_show"] },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["bookingCode", "appointmentId", "service", "date", "time", "status", "updatedAt"]
     },
     "GalleryItem": {
       "title": "Gallery Item",
-      "description": "An image in the bridal gallery.",
+      "description": "Makeup portfolio photograph.",
       "type": "object",
       "properties": {
-        "url": { "type": "string", "description": "Firebase Storage URL of the image" },
-        "title": { "type": "string", "description": "Image title or description" },
-        "category": { "type": "string", "description": "Image category (e.g., Bridal, Party Makeup)" },
-        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when the image was added" }
+        "url": { "type": "string", "maxLength": 1000 },
+        "title": { "type": "string", "maxLength": 140 },
+        "category": { "type": "string", "enum": ["Bridal Makeup", "Reception Makeup", "Engagement Makeup", "Party Makeup", "Hairstyling", "Before and After"] },
+        "caption": { "type": "string", "maxLength": 300 },
+        "isActualClientWork": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["url", "title", "category", "createdAt"]
+      "required": ["url", "title", "category", "isActualClientWork", "createdAt"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Customer review awaiting or approved by admin.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "appointmentId": { "type": "string", "maxLength": 128 },
+        "rating": { "type": "number" },
+        "comment": { "type": "string", "maxLength": 1000 },
+        "photoUrl": { "type": "string", "maxLength": 1000 },
+        "approved": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "rating", "comment", "approved", "createdAt"]
     },
     "Offer": {
       "title": "Offer",
-      "description": "A special discount or promotional offer.",
+      "description": "Promotional discount or coupon offer.",
       "type": "object",
       "properties": {
-        "title": { "type": "string", "description": "Offer title" },
-        "description": { "type": "string", "description": "Offer details" },
-        "code": { "type": "string", "description": "Promo code (optional)" },
-        "expiryDate": { "type": "string", "description": "Expiry date" },
-        "active": { "type": "boolean", "description": "Whether the offer is currently active" },
-        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when the offer was created" }
+        "title": { "type": "string", "maxLength": 140 },
+        "description": { "type": "string", "maxLength": 600 },
+        "code": { "type": "string", "maxLength": 40 },
+        "offerType": { "type": "string", "enum": ["Discount", "Festival", "Bridal Special", "Limited Time"] },
+        "discountLabel": { "type": "string", "maxLength": 60 },
+        "expiryDate": { "type": "string", "maxLength": 30 },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["title", "description", "active", "createdAt"]
+      "required": ["title", "description", "offerType", "active", "createdAt"]
     },
-    "UserProfile": {
-      "title": "User Profile",
-      "description": "User account information and loyalty points.",
+    "Payment": {
+      "title": "Payment",
+      "description": "Payment ledger record linked to an appointment.",
       "type": "object",
       "properties": {
-        "uid": { "type": "string" },
-        "email": { "type": "string" },
-        "displayName": { "type": "string" },
-        "loyaltyPoints": { "type": "number" },
-        "totalSpent": { "type": "number" },
+        "appointmentId": { "type": "string", "maxLength": 128 },
+        "bookingCode": { "type": "string", "maxLength": 32 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "customerName": { "type": "string", "maxLength": 120 },
+        "totalAmount": { "type": "number" },
+        "advanceAmount": { "type": "number" },
+        "remainingBalance": { "type": "number" },
+        "paymentStatus": { "type": "string", "enum": ["unpaid", "partial", "paid", "refunded"] },
+        "paymentMethod": { "type": "string", "enum": ["cash", "upi", "bank_transfer", "online"] },
+        "transactionRef": { "type": "string", "maxLength": 120 },
+        "refundStatus": { "type": "string", "enum": ["none", "requested", "refunded"] },
+        "notes": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "format": "date-time" },
         "updatedAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["uid", "email", "loyaltyPoints", "totalSpent"]
+      "required": ["appointmentId", "bookingCode", "customerName", "totalAmount", "advanceAmount", "remainingBalance", "paymentStatus", "paymentMethod", "refundStatus", "createdAt", "updatedAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "In-app notification for admin or customer.",
+      "type": "object",
+      "properties": {
+        "recipientRole": { "type": "string", "enum": ["admin", "customer"] },
+        "recipientUid": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string", "maxLength": 50 },
+        "title": { "type": "string", "maxLength": 140 },
+        "message": { "type": "string", "maxLength": 500 },
+        "relatedId": { "type": "string", "maxLength": 128 },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["recipientRole", "recipientUid", "type", "title", "message", "read", "createdAt"]
+    },
+    "BusinessSettings": {
+      "title": "Business Settings",
+      "description": "Global salon configuration, hours, holidays, and branding.",
+      "type": "object",
+      "properties": {
+        "businessName": { "type": "string", "maxLength": 120 },
+        "tagline": { "type": "string", "maxLength": 120 },
+        "logoUrl": { "type": "string", "maxLength": 1000 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "whatsappNumber": { "type": "string", "maxLength": 30 },
+        "email": { "type": "string", "maxLength": 160 },
+        "address": { "type": "string", "maxLength": 300 },
+        "workingDays": { "type": "array" },
+        "openingTime": { "type": "string", "maxLength": 10 },
+        "closingTime": { "type": "string", "maxLength": 10 },
+        "breakStart": { "type": "string", "maxLength": 10 },
+        "breakEnd": { "type": "string", "maxLength": 10 },
+        "holidays": { "type": "array" },
+        "defaultSlotDuration": { "type": "number" },
+        "bookingAdvancePercent": { "type": "number" },
+        "cancellationPolicy": { "type": "string", "maxLength": 1000 },
+        "instagramUrl": { "type": "string", "maxLength": 300 },
+        "facebookUrl": { "type": "string", "maxLength": 300 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["businessName", "phone", "whatsappNumber", "openingTime", "closingTime", "defaultSlotDuration"]
+    },
+    "ActivityLog": {
+      "title": "Activity Log",
+      "description": "Audit log for administrative operations.",
+      "type": "object",
+      "properties": {
+        "actorUid": { "type": "string", "maxLength": 128 },
+        "actorEmail": { "type": "string", "maxLength": 200 },
+        "action": { "type": "string", "maxLength": 100 },
+        "entityType": { "type": "string", "maxLength": 60 },
+        "entityId": { "type": "string", "maxLength": 128 },
+        "details": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["actorUid", "actorEmail", "action", "entityType", "createdAt"]
     }
   },
   "firestore": {
-    "/appointments/{appointmentId}": { "schema": "Appointment", "description": "Customer appointment bookings" },
-    "/services/{serviceId}": { "schema": "Service", "description": "Parlour services" },
+    "/userProfiles/{uid}": { "schema": "UserProfile", "description": "Customer profiles and loyalty balances" },
+    "/services/{serviceId}": { "schema": "Service", "description": "Salon service catalogue" },
+    "/serviceCategories/{categoryId}": { "schema": "ServiceCategory", "description": "Service categories" },
+    "/packages/{packageId}": { "schema": "Package", "description": "Bridal & special packages" },
+    "/appointments/{appointmentId}": { "schema": "Appointment", "description": "Customer appointments" },
+    "/bookedSlots/{slotKey}": { "schema": "BookedSlot", "description": "Non-PII time slot lock documents" },
+    "/bookingTrackers/{trackingHash}": { "schema": "BookingTracker", "description": "Zero-PII guest booking status tracker" },
+    "/gallery/{itemId}": { "schema": "GalleryItem", "description": "Makeup portfolio gallery" },
     "/reviews/{reviewId}": { "schema": "Review", "description": "Customer reviews" },
-    "/gallery/{itemId}": { "schema": "GalleryItem", "description": "Bridal gallery images" },
-    "/offers/{offerId}": { "schema": "Offer", "description": "Promotional offers" },
-    "/userProfiles/{uid}": { "schema": "UserProfile", "description": "User profile and loyalty data" }
+    "/offers/{offerId}": { "schema": "Offer", "description": "Offers and promotions" },
+    "/payments/{paymentId}": { "schema": "Payment", "description": "Payment records" },
+    "/notifications/{notificationId}": { "schema": "Notification", "description": "Admin and customer notifications" },
+    "/businessSettings/{settingId}": { "schema": "BusinessSettings", "description": "Salon configuration" },
+    "/activityLogs/{logId}": { "schema": "ActivityLog", "description": "Admin audit logs" }
   }
 }

@@ -1,20 +1,126 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
     // -------------------------------------------------------------------------
     // Phase 3: Primitive Definitions (Hardened Helpers)
     // -------------------------------------------------------------------------
-    function isSignedIn() { return request.auth != null; }
-    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
-    function isAdmin() { 
-      return isSignedIn() && (
-        request.auth.token.email == "dheeraj.rai90@gmail.com" || 
-        request.auth.token.email == "komalbsc@gmail.com"
-      );
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
-    
+
     function incoming() { return request.resource.data; }
     function existing() { return resource.data; }
+    function isSignedIn() { return request.auth != null; }
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return isVerifiedUser() && (
+        request.auth.token.email == "dheeraj.rai90@gmail.com" ||
+        request.auth.token.email == "komalbsc@gmail.com" ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Validation Blueprints
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['uid', 'email', 'displayName', 'loyaltyPoints', 'totalSpent', 'totalVisits', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'email', 'displayName', 'phone', 'address', 'loyaltyPoints', 'totalSpent', 'totalVisits', 'notes', 'favoriteServiceIds', 'createdAt', 'updatedAt'])
+        && data.uid is string && data.uid.size() >= 1 && data.uid.size() <= 128
+        && data.email is string && data.email.size() <= 200
+        && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 120
+        && (!('phone' in data) || (data.phone is string && data.phone.size() <= 24))
+        && (!('address' in data) || (data.address is string && data.address.size() <= 300))
+        && (!('notes' in data) || (data.notes is string && data.notes.size() <= 1000))
+        && (!('favoriteServiceIds' in data) || (data.favoriteServiceIds is list && data.favoriteServiceIds.size() <= 50 && (data.favoriteServiceIds.size() == 0 || data.favoriteServiceIds[0] is string)))
+        && data.loyaltyPoints is number && data.loyaltyPoints >= 0
+        && data.totalSpent is number && data.totalSpent >= 0
+        && data.totalVisits is number && data.totalVisits >= 0;
+    }
+
+    function isValidAppointment(data) {
+      return data.keys().hasAll(['bookingCode', 'name', 'phone', 'bookingType', 'service', 'date', 'time', 'durationMinutes', 'status', 'price', 'advancePaid', 'paymentStatus', 'pointsUsed', 'pointsEarned', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly([
+          'bookingCode', 'userId', 'name', 'phone', 'email', 'bookingType', 'service', 'serviceId', 'packageId',
+          'date', 'time', 'durationMinutes', 'slotKeys', 'notes', 'referenceImages', 'status', 'price',
+          'advancePaid', 'paymentStatus', 'pointsUsed', 'pointsEarned', 'internalNotes',
+          'rescheduleRequested', 'requestedDate', 'requestedTime', 'createdAt', 'updatedAt'
+        ])
+        && data.bookingCode is string && data.bookingCode.size() >= 4 && data.bookingCode.size() <= 32
+        && (!('userId' in data) || data.userId == null || (data.userId is string && data.userId.size() <= 128))
+        && data.name is string && data.name.size() >= 2 && data.name.size() <= 120
+        && data.phone is string && data.phone.size() >= 8 && data.phone.size() <= 24
+        && (!('email' in data) || data.email == null || (data.email is string && data.email.size() <= 200))
+        && data.bookingType in ['service', 'package', 'course']
+        && data['service'] is string && data['service'].size() >= 1 && data['service'].size() <= 160
+        && (!('serviceId' in data) || data.serviceId == null || (data.serviceId is string && data.serviceId.size() <= 128))
+        && (!('packageId' in data) || data.packageId == null || (data.packageId is string && data.packageId.size() <= 128))
+        && data.date is string && data.date.matches('^\\d{4}-\\d{2}-\\d{2}$')
+        && data.time is string && data.time.matches('^\\d{2}:\\d{2}$')
+        && data.durationMinutes is number && data.durationMinutes >= 15 && data.durationMinutes <= 720
+        && (!('slotKeys' in data) || (data.slotKeys is list && data.slotKeys.size() <= 24 && (data.slotKeys.size() == 0 || data.slotKeys[0] is string)))
+        && (!('notes' in data) || (data.notes is string && data.notes.size() <= 1000))
+        && (!('referenceImages' in data) || (data.referenceImages is list && data.referenceImages.size() <= 3 && (data.referenceImages.size() == 0 || data.referenceImages[0] is string)))
+        && (!('internalNotes' in data) || (data.internalNotes is string && data.internalNotes.size() <= 1000))
+        && (!('rescheduleRequested' in data) || data.rescheduleRequested is bool)
+        && (!('requestedDate' in data) || (data.requestedDate is string && data.requestedDate.size() <= 20))
+        && (!('requestedTime' in data) || (data.requestedTime is string && data.requestedTime.size() <= 20))
+        && data.status in ['pending', 'confirmed', 'rescheduled', 'completed', 'cancelled', 'no_show']
+        && data.price is number && data.price >= 0
+        && data.advancePaid is number && data.advancePaid >= 0
+        && data.paymentStatus in ['unpaid', 'partial', 'paid', 'refunded']
+        && data.pointsUsed is number && data.pointsUsed >= 0
+        && data.pointsEarned is number && data.pointsEarned >= 0;
+    }
+
+    function isValidBookedSlot(data) {
+      return data.keys().hasAll(['date', 'time', 'appointmentId', 'status', 'createdAt'])
+        && data.keys().hasOnly(['date', 'time', 'appointmentId', 'status', 'createdAt'])
+        && data.date is string && data.date.matches('^\\d{4}-\\d{2}-\\d{2}$')
+        && data.time is string && data.time.matches('^\\d{2}:\\d{2}$')
+        && data.appointmentId is string && data.appointmentId.size() >= 1 && data.appointmentId.size() <= 128
+        && data.status in ['active', 'released'];
+    }
+
+    function isValidBookingTracker(data) {
+      return data.keys().hasAll(['bookingCode', 'appointmentId', 'service', 'date', 'time', 'status', 'updatedAt'])
+        && data.keys().hasOnly(['bookingCode', 'appointmentId', 'service', 'date', 'time', 'status', 'updatedAt'])
+        && data.bookingCode is string && data.bookingCode.size() >= 4 && data.bookingCode.size() <= 32
+        && data.appointmentId is string && data.appointmentId.size() >= 1 && data.appointmentId.size() <= 128
+        && data['service'] is string && data['service'].size() >= 1 && data['service'].size() <= 160
+        && data.date is string && data.date.size() <= 20
+        && data.time is string && data.time.size() <= 20
+        && data.status in ['pending', 'confirmed', 'rescheduled', 'completed', 'cancelled', 'no_show'];
+    }
+
+    function isValidReview(data) {
+      return data.keys().hasAll(['name', 'rating', 'comment', 'approved', 'createdAt'])
+        && data.keys().hasOnly(['name', 'userId', 'appointmentId', 'rating', 'comment', 'photoUrl', 'approved', 'createdAt'])
+        && data.name is string && data.name.size() >= 2 && data.name.size() <= 100
+        && data.rating is number && data.rating >= 1 && data.rating <= 5
+        && data.comment is string && data.comment.size() >= 3 && data.comment.size() <= 1000
+        && (!('userId' in data) || data.userId == null || (data.userId is string && data.userId.size() <= 128))
+        && (!('appointmentId' in data) || data.appointmentId == null || (data.appointmentId is string && data.appointmentId.size() <= 128))
+        && (!('photoUrl' in data) || data.photoUrl == null || (data.photoUrl is string && data.photoUrl.size() <= 1000))
+        && data.approved is bool;
+    }
+
+    function isValidNotification(data) {
+      return data.keys().hasAll(['recipientRole', 'recipientUid', 'type', 'title', 'message', 'read', 'createdAt'])
+        && data.keys().hasOnly(['recipientRole', 'recipientUid', 'type', 'title', 'message', 'relatedId', 'read', 'createdAt'])
+        && data.recipientRole in ['admin', 'customer']
+        && data.recipientUid is string && data.recipientUid.size() >= 1 && data.recipientUid.size() <= 128
+        && data.type is string && data.type.size() >= 2 && data.type.size() <= 50
+        && data.title is string && data.title.size() >= 2 && data.title.size() <= 140
+        && data.message is string && data.message.size() >= 2 && data.message.size() <= 500
+        && (!('relatedId' in data) || (data.relatedId is string && data.relatedId.size() <= 128))
+        && data.read is bool;
+    }
 
     // -------------------------------------------------------------------------
     // Global Safety Net
@@ -29,59 +135,210 @@ service cloud.firestore {
     }
 
     // -------------------------------------------------------------------------
-    // Domain Rules
+    // Admins Registry (Read-only for admins)
     // -------------------------------------------------------------------------
-
-    // 1. Appointments
-    match /appointments/{appointmentId} {
-      allow create: if isSignedIn() && 
-                    incoming().name is string &&
-                    incoming().status == 'pending' &&
-                    incoming().createdAt == request.time;
-      
-      allow read: if isAdmin() || (isSignedIn() && existing().userId == request.auth.uid);
-      allow update, delete: if isAdmin();
+    match /admins/{uid} {
+      allow get: if isSignedIn() && request.auth.uid == uid;
+      allow list, write: if false;
     }
 
-    // 2. User Profiles
+    // -------------------------------------------------------------------------
+    // 1. User Profiles (PII Isolated)
+    // -------------------------------------------------------------------------
     match /userProfiles/{uid} {
-      allow read: if isOwner(uid) || isAdmin();
-      allow create: if isOwner(uid) && 
-                    incoming().loyaltyPoints == 0 &&
-                    incoming().updatedAt == request.time;
-                    
-      allow update: if isAdmin() || (
-        isOwner(uid) && 
-        incoming().loyaltyPoints == existing().loyaltyPoints &&
-        incoming().updatedAt == request.time
+      allow get: if isValidId(uid) && (isOwner(uid) || isAdmin());
+      allow list: if isAdmin() || (isSignedIn() && resource.data.uid == request.auth.uid);
+
+      allow create: if isValidId(uid)
+                    && isOwner(uid)
+                    && isValidUserProfile(incoming())
+                    && incoming().uid == request.auth.uid
+                    && incoming().loyaltyPoints == 0
+                    && incoming().totalSpent == 0
+                    && incoming().totalVisits == 0
+                    && incoming().updatedAt == request.time;
+
+      allow update: if isValidId(uid) && isValidUserProfile(incoming()) && (
+        isAdmin() ||
+        (
+          isOwner(uid)
+          && incoming().uid == existing().uid
+          && incoming().email == existing().email
+          && incoming().loyaltyPoints == existing().loyaltyPoints
+          && incoming().totalSpent == existing().totalSpent
+          && incoming().totalVisits == existing().totalVisits
+          && incoming().updatedAt == request.time
+          && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'phone', 'address', 'favoriteServiceIds', 'updatedAt'])
+        )
+      );
+      allow delete: if isAdmin() && isValidId(uid);
+    }
+
+    // -------------------------------------------------------------------------
+    // 2. Appointments (PII Isolated + Guest Creation + Action-Based Updates)
+    // -------------------------------------------------------------------------
+    match /appointments/{appointmentId} {
+      allow get: if isValidId(appointmentId) && (isAdmin() || (isSignedIn() && existing().userId == request.auth.uid));
+      allow list: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+
+      allow create: if isValidId(appointmentId)
+                    && isValidAppointment(incoming())
+                    && incoming().status == 'pending'
+                    && incoming().advancePaid == 0
+                    && incoming().paymentStatus == 'unpaid'
+                    && incoming().pointsUsed == 0
+                    && incoming().pointsEarned == 0
+                    && incoming().createdAt == request.time
+                    && incoming().updatedAt == request.time
+                    && (
+                      (isSignedIn() && incoming().userId == request.auth.uid) ||
+                      (!isSignedIn() && incoming().userId == null)
+                    );
+
+      allow update: if isValidId(appointmentId) && isValidAppointment(incoming()) && (
+        isAdmin() ||
+        (
+          isSignedIn()
+          && existing().userId == request.auth.uid
+          && incoming().userId == existing().userId
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && existing().status in ['pending', 'confirmed', 'rescheduled']
+          && (
+            (incoming().status == 'cancelled' && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])) ||
+            (incoming().rescheduleRequested == true && incoming().diff(existing()).affectedKeys().hasOnly(['rescheduleRequested', 'requestedDate', 'requestedTime', 'notes', 'updatedAt']))
+          )
+        )
+      );
+
+      allow delete: if isAdmin() && isValidId(appointmentId);
+    }
+
+    // -------------------------------------------------------------------------
+    // 3. Booked Slots (Non-PII Double-Booking Prevention)
+    // -------------------------------------------------------------------------
+    match /bookedSlots/{slotKey} {
+      allow get: if isValidId(slotKey);
+      allow list: if true;
+      allow create: if isValidId(slotKey)
+                    && isValidBookedSlot(incoming())
+                    && incoming().status == 'active'
+                    && incoming().createdAt == request.time;
+      allow update: if isAdmin() && isValidId(slotKey);
+      allow delete: if isValidId(slotKey) && (
+        isAdmin() ||
+        (isSignedIn() && get(/databases/$(database)/documents/appointments/$(existing().appointmentId)).data.userId == request.auth.uid)
       );
     }
 
-    // 3. Services
+    // -------------------------------------------------------------------------
+    // 4. Booking Trackers (Zero-PII Hash-Keyed Status Lookup)
+    // -------------------------------------------------------------------------
+    match /bookingTrackers/{trackingHash} {
+      allow get: if isValidId(trackingHash);
+      allow list: if false;
+      allow create: if isValidId(trackingHash)
+                    && isValidBookingTracker(incoming())
+                    && incoming().status == 'pending'
+                    && incoming().updatedAt == request.time;
+      allow update: if isValidId(trackingHash) && isValidBookingTracker(incoming()) && (
+        isAdmin() ||
+        (
+          isSignedIn()
+          && incoming().status == 'cancelled'
+          && incoming().appointmentId == existing().appointmentId
+          && incoming().updatedAt == request.time
+          && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
+        )
+      );
+      allow delete: if isAdmin() && isValidId(trackingHash);
+    }
+
+    // -------------------------------------------------------------------------
+    // 5. Public Catalogue & Business Configuration (Admin Managed)
+    // -------------------------------------------------------------------------
     match /services/{serviceId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create, update, delete: if isAdmin() && isValidId(serviceId);
     }
 
-    // 4. Reviews
-    match /reviews/{reviewId} {
-      allow create: if incoming().approved == false &&
-                    incoming().createdAt == request.time;
-                    
-      allow read: if isAdmin() || existing().approved == true;
-      allow update, delete: if isAdmin();
+    match /serviceCategories/{categoryId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isValidId(categoryId);
     }
 
-    // 5. Gallery
+    match /packages/{packageId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isValidId(packageId);
+    }
+
     match /gallery/{itemId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create, update, delete: if isAdmin() && isValidId(itemId);
     }
 
-    // 6. Offers
     match /offers/{offerId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create, update, delete: if isAdmin() && isValidId(offerId);
+    }
+
+    match /businessSettings/{settingId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isValidId(settingId);
+    }
+
+    // -------------------------------------------------------------------------
+    // 6. Reviews (Moderation Enforced)
+    // -------------------------------------------------------------------------
+    match /reviews/{reviewId} {
+      allow get: if isValidId(reviewId) && (isAdmin() || existing().approved == true);
+      allow list: if isAdmin() || resource.data.approved == true;
+      allow create: if isValidId(reviewId)
+                    && isValidReview(incoming())
+                    && incoming().approved == false
+                    && incoming().createdAt == request.time
+                    && (!('userId' in incoming()) || incoming().userId == null || (isSignedIn() && incoming().userId == request.auth.uid));
+      allow update, delete: if isAdmin() && isValidId(reviewId);
+    }
+
+    // -------------------------------------------------------------------------
+    // 7. Payments & Audit Logs
+    // -------------------------------------------------------------------------
+    match /payments/{paymentId} {
+      allow get: if isValidId(paymentId) && (isAdmin() || (isSignedIn() && existing().userId == request.auth.uid));
+      allow list: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create, update, delete: if isAdmin() && isValidId(paymentId);
+    }
+
+    match /activityLogs/{logId} {
+      allow read: if isAdmin();
+      allow create, update, delete: if isAdmin() && isValidId(logId);
+    }
+
+    // -------------------------------------------------------------------------
+    // 8. Notifications
+    // -------------------------------------------------------------------------
+    match /notifications/{notificationId} {
+      allow get: if isValidId(notificationId) && (
+        isAdmin() ||
+        (isSignedIn() && existing().recipientRole == 'customer' && existing().recipientUid == request.auth.uid)
+      );
+      allow list: if isAdmin() || (isSignedIn() && resource.data.recipientRole == 'customer' && resource.data.recipientUid == request.auth.uid);
+      allow create: if isValidId(notificationId)
+                    && isValidNotification(incoming())
+                    && incoming().read == false
+                    && incoming().createdAt == request.time
+                    && (isAdmin() || incoming().recipientRole == 'admin');
+      allow update: if isValidId(notificationId) && isValidNotification(incoming()) && (
+        isAdmin() ||
+        (
+          isSignedIn()
+          && existing().recipientRole == 'customer'
+          && existing().recipientUid == request.auth.uid
+          && incoming().diff(existing()).affectedKeys().hasOnly(['read'])
+        )
+      );
+      allow delete: if isAdmin() && isValidId(notificationId);
     }
   }
 }

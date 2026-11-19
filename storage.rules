@@ -1,14 +1,20 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
+    match /booking-references/{uid}/{fileName} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+                   && request.auth.uid == uid
+                   && request.resource.size < 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+
     match /{allPaths=**} {
-      // Allow public read access to all files
       allow read: if true;
-      
-      // Only allow the admin to upload/delete files
-      // Note: Replace with your admin email check if needed, 
-      // but usually we check request.auth != null for basic security
-      allow write: if request.auth != null && (request.auth.token.email == "dheeraj.rai90@gmail.com" || request.auth.token.email == "komalbsc@gmail.com");
+      allow write: if request.auth != null && (
+        request.auth.token.email == "dheeraj.rai90@gmail.com" ||
+        request.auth.token.email == "komalbsc@gmail.com"
+      );
     }
   }
 }

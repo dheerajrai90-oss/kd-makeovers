@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0D0D0D" />
+    <title>Offline — KD Makeovers &amp; Cosmetics</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #0d0d0d;
+        color: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        padding: 24px;
+        text-align: center;
+      }
+      .card {
+        max-width: 420px;
+        width: 100%;
+        background: #171415;
+        border: 1px solid rgba(239, 208, 208, 0.25);
+        border-radius: 24px;
+        padding: 40px 28px;
+      }
+      .logo-wrap {
+        width: 112px;
+        height: 112px;
+        margin: 0 auto 20px;
+        border-radius: 9999px;
+        background: #0d0d0d;
+        border: 1px solid rgba(239, 208, 208, 0.4);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .logo-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-family: Georgia, serif;
+        font-size: 26px;
+        color: #efd0d0;
+      }
+      p {
+        margin: 0 0 24px;
+        color: #c9bdbd;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .btn {
+        display: inline-block;
+        padding: 12px 24px;
+        border-radius: 12px;
+        background: #efd0d0;
+        color: #0d0d0d;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+      }
+      .contact {
+        margin-top: 20px;
+        font-size: 13px;
+        color: #b88970;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="logo-wrap">
+        <img
+          src="/kd-logo-round.png"
+          alt="KD Makeovers & Cosmetics"
+        />
+      </div>
+      <h1>You Are Offline</h1>
+      <p>
+        KD Makeovers &amp; Cosmetics cannot reach the network right now. Reconnect to browse live slots, submit bookings, or view updates.
+      </p>
+      <button class="btn" onclick="window.location.reload()">Try Again</button>
+      <div class="contact">Studio Helpline: +91 96503 49357</div>
+    </div>
+  </body>
+</html>
