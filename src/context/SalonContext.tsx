@@ -107,7 +107,7 @@ export function SalonProvider({ children }: { children: React.ReactNode }) {
         }
       },
       (error) => {
-        handleFirestoreError(error, OperationType.GET, path);
+        console.warn('User profile listener warning:', path, error.message);
       }
     );
     return () => unsub();

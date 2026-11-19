@@ -40,11 +40,13 @@ export const KDLogo: React.FC<KDLogoProps> = ({
     );
   }
 
-  const iconDimensions = size === 'sm' ? 'w-12 h-12' : 'w-16 h-16';
-  const titleClass = size === 'sm' ? 'text-lg' : 'text-xl sm:text-2xl';
+  const iconDimensions =
+    size === 'sm' ? 'w-10 h-10 sm:w-11 sm:h-11' : 'w-14 h-14 sm:w-16 sm:h-16';
+  const titleClass =
+    size === 'sm' ? 'text-[15px] sm:text-lg leading-tight' : 'text-xl sm:text-2xl leading-tight';
 
   return (
-    <div className={`inline-flex items-center gap-3 shrink-0 ${className}`}>
+    <div className={`inline-flex items-center gap-2.5 sm:gap-3 min-w-0 max-w-full ${className}`}>
       <div
         className={`${iconDimensions} rounded-full bg-kd-black border border-kd-pink/40 flex items-center justify-center overflow-hidden shrink-0`}
       >
@@ -55,9 +57,9 @@ export const KDLogo: React.FC<KDLogoProps> = ({
           referrerPolicy="no-referrer"
         />
       </div>
-      <div className="flex flex-col leading-none">
+      <div className="flex flex-col leading-none min-w-0">
         <span
-          className={`font-serif font-bold text-white tracking-tight whitespace-nowrap ${titleClass}`}
+          className={`font-serif font-bold text-white tracking-tight truncate ${titleClass}`}
         >
           {businessName.includes('KD') ? (
             <>
@@ -69,7 +71,7 @@ export const KDLogo: React.FC<KDLogoProps> = ({
           )}
         </span>
         {showTagline && (
-          <span className="text-[10px] tracking-[0.26em] uppercase text-kd-rosegold mt-1 whitespace-nowrap">
+          <span className="text-[9px] sm:text-[10px] tracking-[0.18em] sm:tracking-[0.24em] uppercase text-kd-rosegold mt-0.5 truncate">
             {tagline}
           </span>
         )}

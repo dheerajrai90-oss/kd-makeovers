@@ -93,32 +93,53 @@ export default function AdminLayout() {
   useEffect(() => {
     if (!isAdmin) return;
 
+    const getTimeMs = (ts: any) => {
+      if (!ts) return 0;
+      if (typeof ts.toMillis === 'function') return ts.toMillis();
+      if (typeof ts.seconds === 'number') return ts.seconds * 1000;
+      return 0;
+    };
+
     const unsubs = [
-      onSnapshot(query(collection(db, 'appointments'), orderBy('createdAt', 'desc')), (s) =>
-        setAppointments(s.docs.map((d) => ({ id: d.id, ...d.data() } as Appointment)))
-      ),
-      onSnapshot(collection(db, 'userProfiles'), (s) =>
-        setCustomers(s.docs.map((d) => ({ uid: d.id, ...d.data() } as UserProfile)))
-      ),
-      onSnapshot(query(collection(db, 'payments'), orderBy('createdAt', 'desc')), (s) =>
-        setPayments(s.docs.map((d) => ({ id: d.id, ...d.data() } as PaymentRecord)))
-      ),
-      onSnapshot(query(collection(db, 'reviews'), orderBy('createdAt', 'desc')), (s) =>
-        setAllReviews(s.docs.map((d) => ({ id: d.id, ...d.data() } as Review)))
-      ),
-      onSnapshot(collection(db, 'serviceCategories'), (s) =>
-        setServiceCategories(s.docs.map((d) => ({ id: d.id, ...d.data() } as ServiceCategory)))
+      onSnapshot(
+        query(collection(db, 'appointments'), orderBy('createdAt', 'desc')),
+        (s) => setAppointments(s.docs.map((d) => ({ id: d.id, ...d.data() } as Appointment))),
+        (err) => console.warn('Admin appointments listener:', err.message)
       ),
       onSnapshot(
-        query(
-          collection(db, 'notifications'),
-          where('recipientRole', '==', 'admin'),
-          orderBy('createdAt', 'desc')
-        ),
-        (s) => setNotifications(s.docs.map((d) => ({ id: d.id, ...d.data() } as AppNotification)))
+        collection(db, 'userProfiles'),
+        (s) => setCustomers(s.docs.map((d) => ({ uid: d.id, ...d.data() } as UserProfile))),
+        (err) => console.warn('Admin users listener:', err.message)
       ),
-      onSnapshot(query(collection(db, 'activityLogs'), orderBy('createdAt', 'desc')), (s) =>
-        setActivityLogs(s.docs.map((d) => ({ id: d.id, ...d.data() } as ActivityLog)))
+      onSnapshot(
+        query(collection(db, 'payments'), orderBy('createdAt', 'desc')),
+        (s) => setPayments(s.docs.map((d) => ({ id: d.id, ...d.data() } as PaymentRecord))),
+        (err) => console.warn('Admin payments listener:', err.message)
+      ),
+      onSnapshot(
+        query(collection(db, 'reviews'), orderBy('createdAt', 'desc')),
+        (s) => setAllReviews(s.docs.map((d) => ({ id: d.id, ...d.data() } as Review))),
+        (err) => console.warn('Admin reviews listener:', err.message)
+      ),
+      onSnapshot(
+        collection(db, 'serviceCategories'),
+        (s) => setServiceCategories(s.docs.map((d) => ({ id: d.id, ...d.data() } as ServiceCategory))),
+        (err) => console.warn('Admin categories listener:', err.message)
+      ),
+      onSnapshot(
+        query(collection(db, 'notifications'), where('recipientRole', '==', 'admin')),
+        (s) =>
+          setNotifications(
+            s.docs
+              .map((d) => ({ id: d.id, ...d.data() } as AppNotification))
+              .sort((a, b) => getTimeMs(b.createdAt) - getTimeMs(a.createdAt))
+          ),
+        (err) => console.warn('Admin notifications listener:', err.message)
+      ),
+      onSnapshot(
+        query(collection(db, 'activityLogs'), orderBy('createdAt', 'desc')),
+        (s) => setActivityLogs(s.docs.map((d) => ({ id: d.id, ...d.data() } as ActivityLog))),
+        (err) => console.warn('Admin activityLogs listener:', err.message)
       ),
     ];
 

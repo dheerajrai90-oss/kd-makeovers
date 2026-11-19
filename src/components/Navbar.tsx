@@ -51,22 +51,26 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 left-0 right-0 z-[100] bg-kd-black/95 backdrop-blur-md border-b border-kd-rosegold/25">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between gap-4 h-16 md:h-20">
+      <header className="sticky top-0 left-0 right-0 z-[100] w-full overflow-x-hidden bg-kd-black/95 backdrop-blur-md border-b border-kd-rosegold/25">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between gap-2 sm:gap-4 h-16 md:h-20 min-w-0">
             {/* Brand Zone */}
-            <Link to="/" onClick={() => setIsMenuOpen(false)} className="shrink-0">
+            <Link
+              to="/"
+              onClick={() => setIsMenuOpen(false)}
+              className="min-w-0 flex-1 lg:flex-initial"
+            >
               <KDLogo
                 logoUrl={settings.logoUrl}
                 businessName={settings.businessName}
                 tagline={settings.tagline}
                 size="sm"
-                showTagline={false}
+                showTagline={true}
               />
             </Link>
 
             {/* Desktop Nav Links */}
-            <nav className="hidden lg:flex items-center gap-6" aria-label="Primary Navigation">
+            <nav className="hidden lg:flex items-center gap-6 shrink-0" aria-label="Primary Navigation">
               {navLinks.map((link) => (
                 <Link
                   key={link.to}
@@ -114,17 +118,17 @@ export default function Navbar() {
             </div>
 
             {/* Mobile Controls */}
-            <div className="flex lg:hidden items-center gap-2">
+            <div className="flex lg:hidden items-center gap-1.5 sm:gap-2 shrink-0">
               <Link
                 to="/book"
-                className="px-3 py-1.5 rounded-lg bg-kd-pink text-kd-black font-semibold text-xs whitespace-nowrap shrink-0"
+                className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-kd-pink text-kd-black font-semibold text-xs whitespace-nowrap shrink-0"
               >
                 Book
               </Link>
               <button
                 type="button"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 text-kd-pink hover:text-white rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center"
+                className="p-2 text-kd-pink hover:text-white rounded-lg min-h-[40px] min-w-[40px] flex items-center justify-center shrink-0"
                 aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               >
                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

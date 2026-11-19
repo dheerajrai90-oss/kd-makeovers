@@ -73,31 +73,37 @@ export default function CustomerDashboard() {
       return;
     }
 
+    const getTimeMs = (ts: any) => {
+      if (!ts) return 0;
+      if (typeof ts.toMillis === 'function') return ts.toMillis();
+      if (typeof ts.seconds === 'number') return ts.seconds * 1000;
+      const parsed = Date.parse(String(ts));
+      return Number.isNaN(parsed) ? 0 : parsed;
+    };
+
     const unsubApp = onSnapshot(
-      query(
-        collection(db, 'appointments'),
-        where('userId', '==', user.uid),
-        orderBy('createdAt', 'desc')
-      ),
+      query(collection(db, 'appointments'), where('userId', '==', user.uid)),
       (snap) => {
-        setAppointments(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Appointment)));
+        const list = snap.docs
+          .map((d) => ({ id: d.id, ...d.data() } as Appointment))
+          .sort((a, b) => getTimeMs(b.createdAt) - getTimeMs(a.createdAt));
+        setAppointments(list);
         setLoading(false);
       },
       (err) => {
         setLoading(false);
-        handleFirestoreError(err, OperationType.LIST, 'appointments');
+        console.warn('Customer appointments listener:', err.message);
       }
     );
 
     const unsubNotif = onSnapshot(
-      query(
-        collection(db, 'notifications'),
-        where('recipientRole', '==', 'customer'),
-        where('recipientUid', '==', user.uid),
-        orderBy('createdAt', 'desc')
-      ),
+      query(collection(db, 'notifications'), where('recipientUid', '==', user.uid)),
       (snap) => {
-        setNotifications(snap.docs.map((d) => ({ id: d.id, ...d.data() } as AppNotification)));
+        const list = snap.docs
+          .map((d) => ({ id: d.id, ...d.data() } as AppNotification))
+          .filter((n) => n.recipientRole === 'customer')
+          .sort((a, b) => getTimeMs(b.createdAt) - getTimeMs(a.createdAt));
+        setNotifications(list);
       },
       (err) => {
         console.warn('Customer notifications listener:', err.message);

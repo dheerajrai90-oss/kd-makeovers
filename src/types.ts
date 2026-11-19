@@ -81,10 +81,10 @@ export interface Service {
   description: string;
   price: string;
   numericPrice?: number;
-  durationMinutes: number;
+  durationMinutes?: number;
   category: string;
   imageUrl?: string;
-  active: boolean;
+  active?: boolean;
   featured?: boolean;
   updatedAt?: any;
 }
@@ -140,7 +140,7 @@ export interface GalleryItem {
   title: string;
   category: GalleryCategory | string;
   caption?: string;
-  isActualClientWork: boolean;
+  isActualClientWork?: boolean;
   createdAt: any;
 }
 
