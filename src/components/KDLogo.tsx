@@ -41,9 +41,9 @@ export const KDLogo: React.FC<KDLogoProps> = ({
   }
 
   const iconDimensions =
-    size === 'sm' ? 'w-10 h-10 sm:w-11 sm:h-11' : 'w-14 h-14 sm:w-16 sm:h-16';
+    size === 'sm' ? 'w-11 h-11 sm:w-12 sm:h-12' : 'w-14 h-14 sm:w-16 sm:h-16';
   const titleClass =
-    size === 'sm' ? 'text-[15px] sm:text-lg leading-tight' : 'text-xl sm:text-2xl leading-tight';
+    size === 'sm' ? 'text-lg sm:text-xl md:text-2xl leading-tight' : 'text-xl sm:text-2xl leading-tight';
 
   return (
     <div className={`inline-flex items-center gap-2.5 sm:gap-3 min-w-0 max-w-full ${className}`}>

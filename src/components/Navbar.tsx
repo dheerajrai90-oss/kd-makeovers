@@ -118,17 +118,11 @@ export default function Navbar() {
             </div>
 
             {/* Mobile Controls */}
-            <div className="flex lg:hidden items-center gap-1.5 sm:gap-2 shrink-0">
-              <Link
-                to="/book"
-                className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-kd-pink text-kd-black font-semibold text-xs whitespace-nowrap shrink-0"
-              >
-                Book
-              </Link>
+            <div className="flex lg:hidden items-center shrink-0">
               <button
                 type="button"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 text-kd-pink hover:text-white rounded-lg min-h-[40px] min-w-[40px] flex items-center justify-center shrink-0"
+                className="p-2 text-kd-pink hover:text-white rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center shrink-0"
                 aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               >
                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
